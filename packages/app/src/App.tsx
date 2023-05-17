@@ -27,7 +27,7 @@ import {
   RELATION_PROVIDES_API,
 } from '@backstage/catalog-model';
 import { createApp } from '@backstage/app-defaults';
-import { AppRouter, FlatRoutes } from '@backstage/core-app-api';
+import { AppRouter, FeatureFlagged, FlatRoutes } from '@backstage/core-app-api';
 import {
   AlertDisplay,
   OAuthRequestDialog,
@@ -59,13 +59,12 @@ import { GraphiQLPage } from '@backstage/plugin-graphiql';
 import { HomepageCompositionRoot } from '@backstage/plugin-home';
 import { LighthousePage } from '@backstage/plugin-lighthouse';
 import { NewRelicPage } from '@backstage/plugin-newrelic';
+import { NextScaffolderPage } from '@backstage/plugin-scaffolder/alpha';
+import { ScaffolderPage, scaffolderPlugin } from '@backstage/plugin-scaffolder';
 import {
-  ScaffolderPage,
-  NextScaffolderPage,
-  scaffolderPlugin,
+  ScaffolderFieldExtensions,
   ScaffolderLayouts,
-} from '@backstage/plugin-scaffolder';
-import { ScaffolderFieldExtensions } from '@backstage/plugin-scaffolder-react';
+} from '@backstage/plugin-scaffolder-react';
 import { SearchPage } from '@backstage/plugin-search';
 import { TechRadarPage } from '@backstage/plugin-tech-radar';
 import {
@@ -78,6 +77,7 @@ import {
   ExpandableNavigation,
   ReportIssue,
   TextSize,
+  LightBox,
 } from '@backstage/plugin-techdocs-module-addons-contrib';
 import {
   SettingsLayout,
@@ -103,10 +103,14 @@ import * as plugins from './plugins';
 import { techDocsPage } from './components/techdocs/TechDocsPage';
 import { ApacheAirflowPage } from '@backstage/plugin-apache-airflow';
 import { RequirePermission } from '@backstage/plugin-permission-react';
-import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common';
+import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
 import { PlaylistIndexPage } from '@backstage/plugin-playlist';
 import { TwoColumnLayout } from './components/scaffolder/customScaffolderLayouts';
 import { ScoreBoardPage } from '@oriflame/backstage-plugin-score-card';
+import { StackstormPage } from '@backstage/plugin-stackstorm';
+import { PuppetDbPage } from '@backstage/plugin-puppetdb';
+import { DevToolsPage } from '@backstage/plugin-devtools';
+import { customDevToolsPage } from './components/devtools/CustomDevToolsPage';
 
 const app = createApp({
   apis,
@@ -115,10 +119,13 @@ const app = createApp({
     // Custom icon example
     alert: AlarmIcon,
   },
-  // Example of application level feature flag
-  // featureFlags: [
-  // { name: 'tech-radar', description: 'Enables the tech radar plugin' },
-  // ],
+  featureFlags: [
+    {
+      name: 'scaffolder-next-preview',
+      description: 'Preview the new Scaffolder Next',
+      pluginId: '',
+    },
+  ],
   components: {
     SignInPage: props => {
       return (
@@ -203,51 +210,56 @@ const routes = (
         <ExpandableNavigation />
         <ReportIssue />
         <TextSize />
+        <LightBox />
       </TechDocsAddons>
     </Route>
-    <Route
-      path="/create"
-      element={
-        <ScaffolderPage
-          defaultPreviewTemplate={defaultPreviewTemplate}
-          groups={[
-            {
-              title: 'Recommended',
-              filter: entity =>
-                entity?.metadata?.tags?.includes('recommended') ?? false,
-            },
-          ]}
-        />
-      }
-    >
-      <ScaffolderFieldExtensions>
-        <LowerCaseValuePickerFieldExtension />
-      </ScaffolderFieldExtensions>
-      <ScaffolderLayouts>
-        <TwoColumnLayout />
-      </ScaffolderLayouts>
-    </Route>
-    <Route
-      path="/create/next"
-      element={
-        <NextScaffolderPage
-          groups={[
-            {
-              title: 'Recommended',
-              filter: entity =>
-                entity?.metadata?.tags?.includes('recommended') ?? false,
-            },
-          ]}
-        />
-      }
-    >
-      <ScaffolderFieldExtensions>
-        <DelayingComponentFieldExtension />
-      </ScaffolderFieldExtensions>
-      <ScaffolderLayouts>
-        <TwoColumnLayout />
-      </ScaffolderLayouts>
-    </Route>
+    <FeatureFlagged with="scaffolder-next-preview">
+      <Route
+        path="/create"
+        element={
+          <NextScaffolderPage
+            groups={[
+              {
+                title: 'Recommended',
+                filter: entity =>
+                  entity?.metadata?.tags?.includes('recommended') ?? false,
+              },
+            ]}
+          />
+        }
+      >
+        <ScaffolderFieldExtensions>
+          <DelayingComponentFieldExtension />
+        </ScaffolderFieldExtensions>
+        <ScaffolderLayouts>
+          <TwoColumnLayout />
+        </ScaffolderLayouts>
+      </Route>
+    </FeatureFlagged>
+    <FeatureFlagged without="scaffolder-next-preview">
+      <Route
+        path="/create"
+        element={
+          <ScaffolderPage
+            defaultPreviewTemplate={defaultPreviewTemplate}
+            groups={[
+              {
+                title: 'Recommended',
+                filter: entity =>
+                  entity?.metadata?.tags?.includes('recommended') ?? false,
+              },
+            ]}
+          />
+        }
+      >
+        <ScaffolderFieldExtensions>
+          <LowerCaseValuePickerFieldExtension />
+        </ScaffolderFieldExtensions>
+        <ScaffolderLayouts>
+          <TwoColumnLayout />
+        </ScaffolderLayouts>
+      </Route>
+    </FeatureFlagged>
     <Route path="/explore" element={<ExplorePage />} />
     <Route
       path="/tech-radar"
@@ -279,6 +291,11 @@ const routes = (
     <Route path="/apache-airflow" element={<ApacheAirflowPage />} />
     <Route path="/playlist" element={<PlaylistIndexPage />} />
     <Route path="/score-board" element={<ScoreBoardPage />} />
+    <Route path="/stackstorm" element={<StackstormPage />} />
+    <Route path="/puppetdb" element={<PuppetDbPage />} />
+    <Route path="/devtools" element={<DevToolsPage />}>
+      {customDevToolsPage}
+    </Route>
   </FlatRoutes>
 );
 

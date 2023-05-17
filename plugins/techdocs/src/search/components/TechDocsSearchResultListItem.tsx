@@ -15,13 +15,7 @@
  */
 
 import React, { PropsWithChildren, ReactNode } from 'react';
-import {
-  Divider,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  makeStyles,
-} from '@material-ui/core';
+import { ListItemIcon, ListItemText, makeStyles } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import { Link } from '@backstage/core-components';
 import { ResultHighlight } from '@backstage/plugin-search-common';
@@ -43,7 +37,7 @@ const useStyles = makeStyles({
  * @public
  */
 export type TechDocsSearchResultListItemProps = {
-  icon?: ReactNode;
+  icon?: ReactNode | ((result: any) => ReactNode);
   result?: any;
   highlight?: ResultHighlight;
   rank?: number;
@@ -138,6 +132,8 @@ export const TechDocsSearchResultListItem = (
               WebkitLineClamp: lineClamp,
               overflow: 'hidden',
             }}
+            color="textSecondary"
+            variant="body2"
           >
             {highlight?.fields.text ? (
               <HighlightedSearchResultText
@@ -157,11 +153,12 @@ export const TechDocsSearchResultListItem = (
   const ListItemWrapper = ({ children }: PropsWithChildren<{}>) =>
     asListItem ? (
       <>
-        <ListItem alignItems="flex-start">
-          {icon && <ListItemIcon>{icon}</ListItemIcon>}
-          <div className={classes.flexContainer}>{children}</div>
-        </ListItem>
-        <Divider component="li" />
+        {icon && (
+          <ListItemIcon>
+            {typeof icon === 'function' ? icon(result) : icon}
+          </ListItemIcon>
+        )}
+        <div className={classes.flexContainer}>{children}</div>
       </>
     ) : (
       <>{children}</>

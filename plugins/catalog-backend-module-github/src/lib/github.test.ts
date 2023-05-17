@@ -16,12 +16,12 @@
 
 import { setupRequestMockHandlers } from '@backstage/backend-test-utils';
 import { GroupEntity, UserEntity } from '@backstage/catalog-model';
-import { graphql } from '@octokit/graphql';
+import { graphql as graphqlOctokit } from '@octokit/graphql';
 import { graphql as graphqlMsw } from 'msw';
 import { setupServer } from 'msw/node';
 import { TeamTransformer, UserTransformer } from './defaultTransformers';
-
 import {
+  getOrganizationsFromUser,
   getOrganizationTeams,
   getOrganizationUsers,
   getTeamMembers,
@@ -35,11 +35,9 @@ import {
 } from './github';
 import fetch from 'node-fetch';
 
-// Workaround for Node.js 18, where native fetch is available, but not yet picked up by msw
-// TODO(Rugvip): remove once https://github.com/mswjs/msw/issues/1388 is resolved
-(global as any).fetch = fetch;
-
 describe('github', () => {
+  const graphql = graphqlOctokit.defaults({ request: { fetch } });
+
   const server = setupServer();
   setupRequestMockHandlers(server);
 
@@ -451,6 +449,37 @@ describe('github', () => {
     });
   });
 
+  describe('getOrganizationsFromUser', () => {
+    it('reads orgs from user', async () => {
+      const input: QueryResponse = {
+        user: {
+          organizations: {
+            pageInfo: { hasNextPage: false },
+            nodes: [
+              {
+                login: 'a',
+              },
+              {
+                login: 'b',
+              },
+              {
+                login: 'c',
+              },
+            ],
+          },
+        },
+      };
+
+      server.use(
+        graphqlMsw.query('orgs', (_req, res, ctx) => res(ctx.data(input))),
+      );
+
+      await expect(getOrganizationsFromUser(graphql, 'foo')).resolves.toEqual({
+        orgs: ['a', 'b', 'c'],
+      });
+    });
+  });
+
   describe('getTeamMembers', () => {
     it('reads team members', async () => {
       const input: QueryResponse = {
@@ -496,6 +525,7 @@ describe('github', () => {
                   name: 'main',
                 },
                 catalogInfoFile: null,
+                visibility: 'public',
               },
               {
                 name: 'demo',
@@ -511,6 +541,7 @@ describe('github', () => {
                   id: 'acb123',
                   text: 'some yaml',
                 },
+                visibility: 'private',
               },
             ],
             pageInfo: {
@@ -534,6 +565,7 @@ describe('github', () => {
               name: 'main',
             },
             catalogInfoFile: null,
+            visibility: 'public',
           },
           {
             name: 'demo',
@@ -549,6 +581,7 @@ describe('github', () => {
               id: 'acb123',
               text: 'some yaml',
             },
+            visibility: 'private',
           },
         ],
       };

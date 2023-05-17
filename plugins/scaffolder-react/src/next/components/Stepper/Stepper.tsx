@@ -21,30 +21,39 @@ import {
   StepLabel as MuiStepLabel,
   Button,
   makeStyles,
+  LinearProgress,
 } from '@material-ui/core';
-import { type IChangeEvent, withTheme } from '@rjsf/core-v5';
-import { ErrorSchema, FieldValidation } from '@rjsf/utils';
+import { type IChangeEvent } from '@rjsf/core-v5';
+import { ErrorSchema } from '@rjsf/utils';
 import React, { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { NextFieldExtensionOptions } from '../../extensions';
-import { TemplateParameterSchema } from '../../../types';
-import { createAsyncValidators } from './createAsyncValidators';
+import {
+  createAsyncValidators,
+  type FormValidation,
+} from './createAsyncValidators';
 import { ReviewState, type ReviewStateProps } from '../ReviewState';
 import { useTemplateSchema } from '../../hooks/useTemplateSchema';
 import validator from '@rjsf/validator-ajv8';
 import { useFormDataFromQuery } from '../../hooks';
 import { FormProps } from '../../types';
-import { LayoutOptions } from '../../../layouts';
 import { useTransformSchemaToProps } from '../../hooks/useTransformSchemaToProps';
+import { hasErrors } from './utils';
+import * as FieldOverrides from './FieldOverrides';
+import { Form } from '../Form';
+import {
+  TemplateParameterSchema,
+  LayoutOptions,
+} from '@backstage/plugin-scaffolder-react';
 
 const useStyles = makeStyles(theme => ({
   backButton: {
     marginRight: theme.spacing(1),
   },
-
   footer: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'right',
+    marginTop: theme.spacing(2),
   },
   formWrapper: {
     padding: theme.spacing(2),
@@ -70,11 +79,6 @@ export type StepperProps = {
   layouts?: LayoutOptions[];
 };
 
-// TODO(blam): We require here, as the types in this package depend on @rjsf/core explicitly
-// which is what we're using here as the default types, it needs to depend on @rjsf/core-v5 because
-// of the re-writing we're doing. Once we've migrated, we can import this the exact same as before.
-const Form = withTheme(require('@rjsf/material-ui-v5').Theme);
-
 /**
  * The `Stepper` component is the Wizard that is rendered when a user selects a template
  * @alpha
@@ -90,11 +94,10 @@ export const Stepper = (stepperProps: StepperProps) => {
   const { steps } = useTemplateSchema(props.manifest);
   const apiHolder = useApiHolder();
   const [activeStep, setActiveStep] = useState(0);
+  const [isValidating, setIsValidating] = useState(false);
   const [formState, setFormState] = useFormDataFromQuery(props.initialState);
 
-  const [errors, setErrors] = useState<
-    undefined | Record<string, FieldValidation>
-  >();
+  const [errors, setErrors] = useState<undefined | FormValidation>();
   const styles = useStyles();
 
   const extensions = useMemo(() => {
@@ -125,22 +128,23 @@ export const Stepper = (stepperProps: StepperProps) => {
     [setFormState],
   );
 
+  const currentStep = useTransformSchemaToProps(steps[activeStep], { layouts });
+
   const handleNext = async ({
     formData = {},
   }: {
     formData?: Record<string, JsonValue>;
   }) => {
-    // TODO(blam): What do we do about loading states, does each field extension get a chance
-    // to display it's own loading? Or should we grey out the entire form.
+    // The validation should never throw, as the validators are wrapped in a try/catch.
+    // This makes it fine to set and unset state without try/catch.
     setErrors(undefined);
+    setIsValidating(true);
 
     const returnedValidation = await validation(formData);
 
-    const hasErrors = Object.values(returnedValidation).some(
-      i => i.__errors?.length,
-    );
+    setIsValidating(false);
 
-    if (hasErrors) {
+    if (hasErrors(returnedValidation)) {
       setErrors(returnedValidation);
     } else {
       setErrors(undefined);
@@ -153,10 +157,9 @@ export const Stepper = (stepperProps: StepperProps) => {
     setFormState(current => ({ ...current, ...formData }));
   };
 
-  const currentStep = useTransformSchemaToProps(steps[activeStep], { layouts });
-
   return (
     <>
+      {isValidating && <LinearProgress variant="indeterminate" />}
       <MuiStepper activeStep={activeStep} alternativeLabel variant="elevation">
         {steps.map((step, index) => (
           <MuiStep key={index}>
@@ -177,7 +180,7 @@ export const Stepper = (stepperProps: StepperProps) => {
             schema={currentStep.schema}
             uiSchema={currentStep.uiSchema}
             onSubmit={handleNext}
-            fields={extensions}
+            fields={{ ...FieldOverrides, ...extensions }}
             showErrorList={false}
             onChange={handleChange}
             {...(props.FormProps ?? {})}
@@ -186,11 +189,16 @@ export const Stepper = (stepperProps: StepperProps) => {
               <Button
                 onClick={handleBack}
                 className={styles.backButton}
-                disabled={activeStep < 1}
+                disabled={activeStep < 1 || isValidating}
               >
                 Back
               </Button>
-              <Button variant="contained" color="primary" type="submit">
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={isValidating}
+              >
                 {activeStep === steps.length - 1 ? reviewButtonText : 'Next'}
               </Button>
             </div>
@@ -208,6 +216,7 @@ export const Stepper = (stepperProps: StepperProps) => {
               </Button>
               <Button
                 variant="contained"
+                color="primary"
                 onClick={() => {
                   props.onCreate(formState);
                   const name =

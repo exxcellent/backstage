@@ -1,5 +1,95 @@
 # @backstage/plugin-kubernetes-common
 
+## 0.6.3
+
+### Patch Changes
+
+- 05f1d74539d: AKS access tokens can now be sent over the wire to the Kubernetes backend.
+- Updated dependencies
+  - @backstage/catalog-model@1.3.0
+  - @backstage/plugin-permission-common@0.7.5
+
+## 0.6.3-next.0
+
+### Patch Changes
+
+- 05f1d74539d: AKS access tokens can now be sent over the wire to the Kubernetes backend.
+
+## 0.6.2
+
+### Patch Changes
+
+- 804f6d16b0c: Introduced proxy permission types to be used with the kubernetes proxy endpoint's permission framework integration.
+- Updated dependencies
+  - @backstage/plugin-permission-common@0.7.5
+  - @backstage/catalog-model@1.3.0
+
+## 0.6.2-next.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/catalog-model@1.3.0-next.0
+  - @backstage/plugin-permission-common@0.7.5-next.0
+
+## 0.6.2-next.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/plugin-permission-common@0.7.5-next.0
+  - @backstage/catalog-model@1.2.1
+
+## 0.6.2-next.0
+
+### Patch Changes
+
+- 804f6d16b0c: Introduced proxy permission types to be used with the kubernetes proxy endpoint's permission framework integration.
+- Updated dependencies
+  - @backstage/catalog-model@1.2.1
+  - @backstage/plugin-permission-common@0.7.4
+
+## 0.6.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/catalog-model@1.2.1
+
+## 0.6.1-next.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/catalog-model@1.2.1-next.1
+
+## 0.6.1-next.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/catalog-model@1.2.1-next.0
+
+## 0.6.0
+
+### Minor Changes
+
+- 1728c1ef01: **BREAKING**: Renamed misspelled `LimitRangeFetchReponse` to `LimitRangeFetchResponse`.
+
+### Patch Changes
+
+- 2518ef5b8a: New K8s catalog entity annotations added that will replace now deprecated k8s annotations in the catalog-model package. K8s annotation imports should now be made from plugin-kubernetes-common.
+- 628e2bd89a: Updated dependency `@kubernetes/client-node` to `0.18.1`.
+- Updated dependencies
+  - @backstage/catalog-model@1.2.0
+
+## 0.6.0-next.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/catalog-model@1.2.0-next.1
+
 ## 0.6.0-next.1
 
 ### Patch Changes

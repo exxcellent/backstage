@@ -25,6 +25,13 @@ const configOption = [
   Array<string>(),
 ] as const;
 
+export function registerOnboardCommand(program: Command) {
+  program
+    .command('onboard', { hidden: true })
+    .description('Get help setting up your Backstage App.')
+    .action(lazy(() => import('./onboard').then(m => m.command)));
+}
+
 export function registerRepoCommand(program: Command) {
   const command = program
     .command('repo [command]')
@@ -116,7 +123,7 @@ export function registerScriptCommand(program: Command) {
     )
     .option(
       '--experimental-type-build',
-      'Enable experimental type build. Does not apply to app or backend packages.',
+      'Enable experimental type build. Does not apply to app or backend packages. [DEPRECATED]',
     )
     .option(
       '--skip-build-dependencies',
@@ -189,6 +196,13 @@ export function registerMigrateCommand(program: Command) {
     .description('Set package scripts according to each package role')
     .action(
       lazy(() => import('./migrate/packageScripts').then(m => m.command)),
+    );
+
+  command
+    .command('package-exports')
+    .description('Synchronize package subpath export definitions')
+    .action(
+      lazy(() => import('./migrate/packageExports').then(m => m.command)),
     );
 
   command
@@ -331,6 +345,10 @@ export function registerCommands(program: Command) {
     .option('--lax', 'Do not require environment variables to be set')
     .option('--frontend', 'Only validate the frontend configuration')
     .option('--deprecated', 'Output deprecated configuration settings')
+    .option(
+      '--strict',
+      'Enable strict config validation, forbidding errors and unknown keys',
+    )
     .option(...configOption)
     .description(
       'Validate that the given configuration loads and matches schema',
@@ -353,6 +371,7 @@ export function registerCommands(program: Command) {
   registerRepoCommand(program);
   registerScriptCommand(program);
   registerMigrateCommand(program);
+  registerOnboardCommand(program);
 
   program
     .command('versions:bump')

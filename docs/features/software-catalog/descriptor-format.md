@@ -239,23 +239,24 @@ Example: `visits-tracking-service`, `CircleciBuildsDumpV2_avro_gcs`
 
 ### `namespace` [optional]
 
-The ID of a namespace that the entity belongs to. This is a string that follows
-the same format restrictions as `name` above.
+The ID of a namespace that the entity belongs to. This field is optional, and
+currently has no special semantics apart from bounding the name uniqueness
+constraint if specified. It is reserved for future use and may get broader
+semantic implication later.
 
-This field is optional, and currently has no special semantics apart from
-bounding the name uniqueness constraint if specified. It is reserved for future
-use and may get broader semantic implication later. For now, it is recommended
-to not specify a namespace unless you have specific need to do so. This means
-the entity belongs to the `"default"` namespace.
+For now, it is recommended to not specify a namespace unless you have specific
+need to do so. This means the entity belongs to the `"default"` namespace.
 
-Namespaces may also be part of the catalog, and are `v1` / `Namespace` entities,
-i.e. not Backstage specific but the same as in Kubernetes.
+Namespaces must be sequences of `[a-zA-Z0-9]`, possibly separated by `-`, at
+most 63 characters in total. Namespace names are case insensitive and will be rendered as lower case in most places.
+
+Example: `tracking-services`, `payment`
 
 ### `uid` [output]
 
 Each entity gets an automatically generated globally unique ID when it first
 enters the database. This field is not meant to be specified as input data, but
-is rater created by the database engine itself when producing the output entity.
+is rather created by the database engine itself when producing the output entity.
 
 Note that `uid` values are _not_ to be seen as stable, and should _not_ be used
 as external references to an entity. The `uid` can change over time even when a
@@ -400,12 +401,8 @@ follows.
   // ...
   "relations": [
     {
-      "target": {
-        "kind": "group",
-        "namespace": "default",
-        "name": "dev.infra"
-      },
-      "type": "ownedBy"
+      "type": "ownedBy",
+      "targetRef": "group:default/dev.infra"
     }
   ],
   "spec": {
@@ -417,11 +414,11 @@ follows.
 
 The fields of a relation are:
 
-| Field      | Type   | Description                                                                      |
-| ---------- | ------ | -------------------------------------------------------------------------------- |
-| `target`   | Object | A complete [compound reference](references.md) to the other end of the relation. |
-| `type`     | String | The type of relation FROM a source entity TO the target entity.                  |
-| `metadata` | Object | Reserved for future use.                                                         |
+| Field       | Type   | Description                                                                |
+| ----------- | ------ | -------------------------------------------------------------------------- |
+| `targetRef` | String | A full [entity reference](references.md) to the other end of the relation. |
+| `type`      | String | The type of relation FROM a source entity TO the target entity.            |
+| `metadata`  | Object | Reserved for future use.                                                   |
 
 Entity descriptor YAML files are not supposed to contain this field. Instead,
 catalog processors analyze the entity descriptor data and its surroundings, and

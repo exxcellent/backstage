@@ -15,7 +15,7 @@
  */
 
 import { Config } from '@backstage/config';
-import { assertError, InputError } from '@backstage/errors';
+import { assertError, InputError, NotFoundError } from '@backstage/errors';
 import {
   DefaultGithubCredentialsProvider,
   GithubCredentialsProvider,
@@ -29,6 +29,7 @@ import {
   initRepoAndPush,
 } from '../helpers';
 import { getRepoSourceDirectory, parseRepoUrl } from '../publish/util';
+import { entityRefToName } from '../../builtin/helpers';
 
 const DEFAULT_TIMEOUT_MS = 60_000;
 
@@ -135,6 +136,10 @@ export async function createGithubRepoWithCollaboratorsAndTopics(
     username: owner,
   });
 
+  if (access?.startsWith(`${owner}/`)) {
+    await validateAccessTeam(client, access);
+  }
+
   const repoCreationPromise =
     user.data.type === 'Organization'
       ? client.rest.repos.createInOrg({
@@ -214,13 +219,13 @@ export async function createGithubRepoWithCollaboratorsAndTopics(
           await client.rest.repos.addCollaborator({
             owner,
             repo,
-            username: collaborator.user,
+            username: entityRefToName(collaborator.user),
             permission: collaborator.access,
           });
         } else if ('team' in collaborator) {
           await client.rest.teams.addOrUpdateRepoPermissionsInOrg({
             org: owner,
-            team_slug: collaborator.team,
+            team_slug: entityRefToName(collaborator.team),
             owner,
             repo,
             permission: collaborator.access,
@@ -289,7 +294,7 @@ export async function initRepoPushAndProtect(
   gitAuthorEmail?: string,
   dismissStaleReviews?: boolean,
   requiredCommitSigning?: boolean,
-) {
+): Promise<{ commitHash: string }> {
   const gitAuthorInfo = {
     name: gitAuthorName
       ? gitAuthorName
@@ -303,7 +308,7 @@ export async function initRepoPushAndProtect(
     ? gitCommitMessage
     : config.getOptionalString('scaffolder.defaultCommitMessage');
 
-  await initRepoAndPush({
+  const commitResult = await initRepoAndPush({
     dir: getRepoSourceDirectory(workspacePath, sourcePath),
     remoteUrl,
     defaultBranch,
@@ -342,6 +347,8 @@ export async function initRepoPushAndProtect(
       );
     }
   }
+
+  return { commitHash: commitResult.commitHash };
 }
 
 function extractCollaboratorName(
@@ -350,4 +357,23 @@ function extractCollaboratorName(
   if ('username' in collaborator) return collaborator.username;
   if ('user' in collaborator) return collaborator.user;
   return collaborator.team;
+}
+
+async function validateAccessTeam(client: Octokit, access: string) {
+  const [org, team_slug] = access.split('/');
+  try {
+    // Below rule disabled because of a 'getByName' check for a different library
+    // incorrectly triggers here.
+    // eslint-disable-next-line testing-library/no-await-sync-query
+    await client.rest.teams.getByName({
+      org,
+      team_slug,
+    });
+  } catch (e) {
+    if (e.response.data.message === 'Not Found') {
+      const message = `Received 'Not Found' from the API; one of org:
+        ${org} or team: ${team_slug} was not found within GitHub.`;
+      throw new NotFoundError(message);
+    }
+  }
 }

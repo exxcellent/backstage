@@ -105,7 +105,6 @@ const StyledMTableHeader = withStyles(
       borderTop: `1px solid ${theme.palette.grey.A100}`,
       borderBottom: `1px solid ${theme.palette.grey.A100}`,
       // withStyles hasn't a generic overload for theme
-      color: (theme as BackstageTheme).palette.textSubtle,
       fontWeight: theme.typography.fontWeightBold,
       position: 'static',
       wordBreak: 'normal',
@@ -169,7 +168,7 @@ function convertColumns<T extends object>(
   theme: BackstageTheme,
 ): TableColumn<T>[] {
   return columns.map(column => {
-    const headerStyle: React.CSSProperties = {};
+    const headerStyle: React.CSSProperties = column.headerStyle ?? {};
 
     let cellStyle = column.cellStyle || {};
 
@@ -376,7 +375,7 @@ export function Table<T extends object = {}>(props: TableProps<T>) {
       const newData = (data as any[]).filter(
         el =>
           !!Object.entries(selectedFilters)
-            .filter(([, value]) => !!value.length)
+            .filter(([, value]) => !!(value as { length?: number }).length)
             .every(([key, filterValue]) => {
               const fieldValue = extractValueByField(
                 el,

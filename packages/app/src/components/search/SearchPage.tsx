@@ -44,9 +44,6 @@ import { ToolSearchResultListItem } from '@backstage/plugin-explore';
 import BuildIcon from '@material-ui/icons/Build';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  bar: {
-    padding: theme.spacing(1, 0),
-  },
   filter: {
     '& + &': {
       marginTop: theme.spacing(2.5),
@@ -70,15 +67,14 @@ const SearchPage = () => {
       <Content>
         <Grid container direction="row">
           <Grid item xs={12}>
-            <Paper className={classes.bar}>
-              <SearchBar debounceTime={100} />
-            </Paper>
+            <SearchBar debounceTime={100} />
           </Grid>
           {!isMobile && (
             <Grid item xs={3}>
               <SearchType.Accordion
                 name="Result Type"
                 defaultValue="software-catalog"
+                showCounts
                 types={[
                   {
                     value: 'software-catalog',

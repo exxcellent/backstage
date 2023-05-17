@@ -21,5 +21,5 @@
  */
 
 export { EventsBackend } from './service/EventsBackend';
-export { eventsPlugin } from './service/EventsPlugin';
 export { HttpPostIngressEventPublisher } from './service/http';
+export { DefaultEventBroker } from './service/DefaultEventBroker';

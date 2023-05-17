@@ -1,5 +1,222 @@
 # @backstage/plugin-search-react
 
+## 1.6.0
+
+### Minor Changes
+
+- 750e45539ad: Add close button & improve search input.
+
+  MUI's Paper wrapping the SearchBar in the SearchPage was removed, we recommend users update their apps accordingly.
+
+  SearchBarBase's TextField's label support added & aria-label uses label string if present, tests relying on the default placeholder value should still work unless custom placeholder was given.
+
+- 1ce7f84b2e8: <SearchBar/> accepts InputProp property that can override keys from default
+
+### Patch Changes
+
+- f785f0804cd: `SearchPagination` now automatically resets the page cursor when the page limit is changed
+- adb31096bc2: Fix text-overflow UI issue for Lifecycle spans in SearchFilter checkbox labels.
+- Updated dependencies
+  - @backstage/theme@0.3.0
+  - @backstage/core-components@0.13.1
+  - @backstage/core-plugin-api@1.5.1
+  - @backstage/types@1.0.2
+  - @backstage/version-bridge@1.0.4
+  - @backstage/plugin-search-common@1.2.3
+
+## 1.6.0-next.2
+
+### Minor Changes
+
+- 1ce7f84b2e8: <SearchBar/> accepts InputProp property that can override keys from default
+
+### Patch Changes
+
+- adb31096bc2: Fix text-overflow UI issue for Lifecycle spans in SearchFilter checkbox labels.
+- Updated dependencies
+  - @backstage/theme@0.3.0-next.0
+  - @backstage/core-components@0.13.1-next.1
+  - @backstage/core-plugin-api@1.5.1
+
+## 1.6.0-next.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/core-components@0.13.1-next.0
+  - @backstage/core-plugin-api@1.5.1
+
+## 1.6.0-next.0
+
+### Minor Changes
+
+- 750e45539ad: Add close button & improve search input.
+
+  MUI's Paper wrapping the SearchBar in the SearchPage was removed, we recommend users update their apps accordingly.
+
+  SearchBarBase's TextField's label support added & aria-label uses label string if present, tests relying on the default placeholder value should still work unless custom placeholder was given.
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/core-components@0.13.0
+  - @backstage/core-plugin-api@1.5.1
+  - @backstage/theme@0.2.19
+  - @backstage/types@1.0.2
+  - @backstage/version-bridge@1.0.4
+  - @backstage/plugin-search-common@1.2.3
+
+## 1.5.2
+
+### Patch Changes
+
+- b2e182cdfa4: Fixes a UI bug in search result item which rendered the item text with incorrect font size and color
+- 8e00acb28db: Small tweaks to remove warnings in the console during development (mainly focusing on techdocs)
+- e0c6e8b9c3c: Update peer dependencies
+- Updated dependencies
+  - @backstage/core-components@0.13.0
+  - @backstage/theme@0.2.19
+  - @backstage/core-plugin-api@1.5.1
+  - @backstage/version-bridge@1.0.4
+  - @backstage/types@1.0.2
+  - @backstage/plugin-search-common@1.2.3
+
+## 1.5.2-next.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/core-components@0.13.0-next.3
+  - @backstage/core-plugin-api@1.5.1-next.1
+  - @backstage/theme@0.2.19-next.0
+  - @backstage/types@1.0.2
+  - @backstage/version-bridge@1.0.4-next.0
+  - @backstage/plugin-search-common@1.2.3-next.0
+
+## 1.5.2-next.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/core-components@0.12.6-next.2
+  - @backstage/core-plugin-api@1.5.1-next.1
+  - @backstage/theme@0.2.19-next.0
+  - @backstage/types@1.0.2
+  - @backstage/version-bridge@1.0.4-next.0
+  - @backstage/plugin-search-common@1.2.3-next.0
+
+## 1.5.2-next.1
+
+### Patch Changes
+
+- e0c6e8b9c3c: Update peer dependencies
+- Updated dependencies
+  - @backstage/core-components@0.12.6-next.1
+  - @backstage/core-plugin-api@1.5.1-next.0
+  - @backstage/version-bridge@1.0.4-next.0
+  - @backstage/theme@0.2.19-next.0
+  - @backstage/types@1.0.2
+  - @backstage/plugin-search-common@1.2.3-next.0
+
+## 1.5.2-next.0
+
+### Patch Changes
+
+- b2e182cdfa4: Fixes a UI bug in search result item which rendered the item text with incorrect font size and color
+- 8e00acb28db: Small tweaks to remove warnings in the console during development (mainly focusing on techdocs)
+- Updated dependencies
+  - @backstage/core-components@0.12.6-next.0
+  - @backstage/core-plugin-api@1.5.0
+  - @backstage/theme@0.2.18
+  - @backstage/types@1.0.2
+  - @backstage/version-bridge@1.0.3
+  - @backstage/plugin-search-common@1.2.2
+
+## 1.5.1
+
+### Patch Changes
+
+- 65454876fb2: Minor API report tweaks
+- 553f3c95011: Correctly disable next button in `SearchPagination` on last page
+- Updated dependencies
+  - @backstage/core-components@0.12.5
+  - @backstage/core-plugin-api@1.5.0
+  - @backstage/theme@0.2.18
+  - @backstage/types@1.0.2
+  - @backstage/version-bridge@1.0.3
+  - @backstage/plugin-search-common@1.2.2
+
+## 1.5.1-next.2
+
+### Patch Changes
+
+- 65454876fb2: Minor API report tweaks
+- 553f3c95011: Correctly disable next button in `SearchPagination` on last page
+- Updated dependencies
+  - @backstage/core-components@0.12.5-next.2
+  - @backstage/core-plugin-api@1.5.0-next.2
+
+## 1.5.1-next.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/core-components@0.12.5-next.1
+  - @backstage/core-plugin-api@1.4.1-next.1
+  - @backstage/theme@0.2.18-next.0
+  - @backstage/types@1.0.2
+  - @backstage/version-bridge@1.0.3
+  - @backstage/plugin-search-common@1.2.2-next.0
+
+## 1.5.1-next.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/core-plugin-api@1.4.1-next.0
+  - @backstage/core-components@0.12.5-next.0
+  - @backstage/theme@0.2.17
+  - @backstage/types@1.0.2
+  - @backstage/version-bridge@1.0.3
+  - @backstage/plugin-search-common@1.2.1
+
+## 1.5.0
+
+### Minor Changes
+
+- 0eaa579f89: - Create the search results extensions, for more details see the documentation [here](https://backstage.io/docs/features/search/how-to-guides#how-to-render-search-results-using-extensions);
+  - Update the `SearchResult`, `SearchResultList` and `SearchResultGroup` components to use extensions and default their props to optionally accept a query, when the query is not passed, the component tries to get it from the search context.
+
+### Patch Changes
+
+- 66e2aab4c4: `ListItem` wrapper component moved to `SearchResultListItemExtension` for all `*SearchResultListItems` that are exported as extensions. This is to make sure the list only contains list elements.
+
+  Note: If you have implemented a custom result list item, we recommend you to remove the list item wrapper to avoid nested `<li>` elements.
+
+- Updated dependencies
+  - @backstage/core-components@0.12.4
+  - @backstage/theme@0.2.17
+  - @backstage/core-plugin-api@1.4.0
+  - @backstage/types@1.0.2
+  - @backstage/version-bridge@1.0.3
+  - @backstage/plugin-search-common@1.2.1
+
+## 1.5.0-next.1
+
+### Patch Changes
+
+- 66e2aab4c4: `ListItem` wrapper component moved to `SearchResultListItemExtension` for all `*SearchResultListItems` that are exported as extensions. This is to make sure the list only contains list elements.
+
+  Note: If you have implemented a custom result list item, we recommend you to remove the list item wrapper to avoid nested `<li>` elements.
+
+- Updated dependencies
+  - @backstage/core-components@0.12.4-next.1
+  - @backstage/core-plugin-api@1.3.0
+  - @backstage/theme@0.2.16
+  - @backstage/types@1.0.2
+  - @backstage/version-bridge@1.0.3
+  - @backstage/plugin-search-common@1.2.1
+
 ## 1.5.0-next.0
 
 ### Minor Changes

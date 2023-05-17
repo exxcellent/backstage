@@ -19,11 +19,15 @@ import { default as React_2 } from 'react';
 import { ReactNode } from 'react';
 import { ResultHighlight } from '@backstage/plugin-search-common';
 import { RouteRef } from '@backstage/core-plugin-api';
+import { SearchResultListItemExtensionProps } from '@backstage/plugin-search-react';
+import { SyncResult as SyncResult_2 } from '@backstage/plugin-techdocs-react';
 import { TableColumn } from '@backstage/core-components';
 import { TableOptions } from '@backstage/core-components';
 import { TableProps } from '@backstage/core-components';
+import { TechDocsApi as TechDocsApi_2 } from '@backstage/plugin-techdocs-react';
 import { TechDocsEntityMetadata as TechDocsEntityMetadata_2 } from '@backstage/plugin-techdocs-react';
 import { TechDocsMetadata as TechDocsMetadata_2 } from '@backstage/plugin-techdocs-react';
+import { TechDocsStorageApi as TechDocsStorageApi_2 } from '@backstage/plugin-techdocs-react';
 import { ToolbarProps } from '@material-ui/core';
 import { UserListFilterKind } from '@backstage/plugin-catalog-react';
 
@@ -83,7 +87,7 @@ export const DocsTable: {
     createStarEntityAction(
       isStarredEntity: Function,
       toggleStarredEntity: Function,
-    ): ({ entity }: DocsTableRow) => {
+    ): (row: DocsTableRow) => {
       cellStyle: {
         paddingLeft: string;
       };
@@ -120,9 +124,9 @@ export const EmbeddedDocsRouter: (
 ) => JSX.Element | null;
 
 // @public
-export const EntityListDocsGrid: ({
-  groups,
-}: EntityListDocsGridPageProps) => JSX.Element;
+export const EntityListDocsGrid: (
+  props: EntityListDocsGridPageProps,
+) => JSX.Element;
 
 // @public
 export type EntityListDocsGridPageProps = {
@@ -146,7 +150,7 @@ export const EntityListDocsTable: {
     createStarEntityAction(
       isStarredEntity: Function,
       toggleStarredEntity: Function,
-    ): ({ entity }: DocsTableRow) => {
+    ): (row: DocsTableRow) => {
       cellStyle: {
         paddingLeft: string;
       };
@@ -236,7 +240,7 @@ export interface TechDocsApi {
 export const techdocsApiRef: ApiRef<TechDocsApi>;
 
 // @public
-export class TechDocsClient implements TechDocsApi {
+export class TechDocsClient implements TechDocsApi_2 {
   constructor(options: {
     configApi: Config;
     discoveryApi: DiscoveryApi;
@@ -314,10 +318,9 @@ export { techdocsPlugin as plugin };
 export { techdocsPlugin };
 
 // @public
-export const TechDocsReaderLayout: ({
-  withSearch,
-  withHeader,
-}: TechDocsReaderLayoutProps) => JSX.Element;
+export const TechDocsReaderLayout: (
+  props: TechDocsReaderLayoutProps,
+) => JSX.Element;
 
 // @public
 export type TechDocsReaderLayoutProps = {
@@ -374,9 +377,9 @@ export const TechDocsReaderPageSubheader: (props: {
 }) => JSX.Element | null;
 
 // @public
-export const TechDocsReaderProvider: ({
-  children,
-}: TechDocsReaderProviderProps) => JSX.Element;
+export const TechDocsReaderProvider: (
+  props: TechDocsReaderProviderProps,
+) => JSX.Element;
 
 // @public
 export type TechDocsReaderProviderProps = {
@@ -400,12 +403,12 @@ export type TechDocsSearchProps = {
 
 // @public
 export const TechDocsSearchResultListItem: (
-  props: TechDocsSearchResultListItemProps,
+  props: SearchResultListItemExtensionProps<TechDocsSearchResultListItemProps>,
 ) => JSX.Element | null;
 
 // @public
 export type TechDocsSearchResultListItemProps = {
-  icon?: ReactNode;
+  icon?: ReactNode | ((result: any) => ReactNode);
   result?: any;
   highlight?: ResultHighlight;
   rank?: number;
@@ -442,7 +445,7 @@ export interface TechDocsStorageApi {
 export const techdocsStorageApiRef: ApiRef<TechDocsStorageApi>;
 
 // @public
-export class TechDocsStorageClient implements TechDocsStorageApi {
+export class TechDocsStorageClient implements TechDocsStorageApi_2 {
   constructor(options: {
     configApi: Config;
     discoveryApi: DiscoveryApi;
@@ -471,6 +474,6 @@ export class TechDocsStorageClient implements TechDocsStorageApi {
   syncEntityDocs(
     entityId: CompoundEntityRef,
     logHandler?: (line: string) => void,
-  ): Promise<SyncResult>;
+  ): Promise<SyncResult_2>;
 }
 ```

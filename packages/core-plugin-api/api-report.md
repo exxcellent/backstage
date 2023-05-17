@@ -242,6 +242,11 @@ export const bitbucketAuthApiRef: ApiRef<
 >;
 
 // @public
+export const bitbucketServerAuthApiRef: ApiRef<
+  OAuthApi & ProfileInfoApi & BackstageIdentityApi & SessionApi
+>;
+
+// @public
 export type BootErrorPageProps = {
   step: 'load-config' | 'load-chunk';
   error: Error;
@@ -477,7 +482,11 @@ export const githubAuthApiRef: ApiRef<
 
 // @public
 export const gitlabAuthApiRef: ApiRef<
-  OAuthApi & ProfileInfoApi & BackstageIdentityApi & SessionApi
+  OAuthApi &
+    OpenIdConnectApi &
+    ProfileInfoApi &
+    BackstageIdentityApi &
+    SessionApi
 >;
 
 // @public
@@ -644,17 +653,6 @@ export type PluginFeatureFlagConfig = {
   name: string;
 };
 
-// @alpha
-export interface PluginOptionsProviderProps {
-  // (undocumented)
-  children: ReactNode;
-  // (undocumented)
-  plugin?: BackstagePlugin;
-}
-
-// @alpha
-export const PluginProvider: (props: PluginOptionsProviderProps) => JSX.Element;
-
 // @public
 export type ProfileInfo = {
   email?: string;
@@ -755,11 +753,6 @@ export function useElementFilter<T>(
   dependencies?: any[],
 ): T;
 
-// @alpha
-export function usePluginOptions<
-  TPluginOptions extends {} = {},
->(): TPluginOptions;
-
 // @public
 export function useRouteRef<Optional extends boolean, Params extends AnyParams>(
   routeRef: ExternalRouteRef<Params, Optional>,
@@ -776,10 +769,12 @@ export function useRouteRefParams<Params extends AnyParams>(
 ): Params;
 
 // @public
-export function withApis<T>(apis: TypesToApiRefs<T>): <P extends T>(
-  WrappedComponent: React_2.ComponentType<P>,
+export function withApis<T extends {}>(
+  apis: TypesToApiRefs<T>,
+): <TProps extends T>(
+  WrappedComponent: React_2.ComponentType<TProps>,
 ) => {
-  (props: React_2.PropsWithChildren<Omit<P, keyof T>>): JSX.Element;
+  (props: React_2.PropsWithChildren<Omit<TProps, keyof T>>): JSX.Element;
   displayName: string;
 };
 ```

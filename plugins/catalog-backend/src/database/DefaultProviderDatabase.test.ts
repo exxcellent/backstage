@@ -24,6 +24,8 @@ import { DefaultProviderDatabase } from './DefaultProviderDatabase';
 import { applyDatabaseMigrations } from './migrations';
 import { DbRefreshStateReferencesRow, DbRefreshStateRow } from './tables';
 
+jest.setTimeout(60_000);
+
 describe('DefaultProviderDatabase', () => {
   const defaultLogger = getVoidLogger();
   const databases = TestDatabases.create({
@@ -184,7 +186,6 @@ describe('DefaultProviderDatabase', () => {
           ),
         ).toBeTruthy();
       },
-      60_000,
     );
 
     it.each(databases.eachSupportedId())(
@@ -321,7 +322,6 @@ describe('DefaultProviderDatabase', () => {
           ),
         ).toBeFalsy();
       },
-      60_000,
     );
 
     it.each(databases.eachSupportedId())(
@@ -392,7 +392,6 @@ describe('DefaultProviderDatabase', () => {
           ),
         ).toBeTruthy();
       },
-      60_000,
     );
 
     it.each(databases.eachSupportedId())(
@@ -443,7 +442,6 @@ describe('DefaultProviderDatabase', () => {
           }),
         ]);
       },
-      60_000,
     );
 
     it.each(databases.eachSupportedId())(
@@ -493,7 +491,6 @@ describe('DefaultProviderDatabase', () => {
           ),
         ).toBeFalsy();
       },
-      60_000,
     );
 
     it.each(databases.eachSupportedId())(
@@ -560,7 +557,6 @@ describe('DefaultProviderDatabase', () => {
           }),
         ]);
       },
-      60_000,
     );
 
     it.each(databases.eachSupportedId())(
@@ -688,7 +684,6 @@ describe('DefaultProviderDatabase', () => {
           },
         ]);
       },
-      60_000,
     );
 
     it.each(databases.eachSupportedId())(
@@ -743,7 +738,39 @@ describe('DefaultProviderDatabase', () => {
           ]),
         );
       },
-      60_000,
+    );
+
+    it.each(databases.eachSupportedId())(
+      'should gracefully handle accidental duplicate refresh state references when deletion happens during a full sync, %p',
+      async databaseId => {
+        const fakeLogger = { debug: jest.fn() };
+        const { knex, db } = await createDatabase(
+          databaseId,
+          fakeLogger as any,
+        );
+
+        await createLocations(knex, ['component:default/a']);
+
+        await insertRefRow(knex, {
+          source_key: 'a',
+          target_entity_ref: 'component:default/a',
+        });
+        await insertRefRow(knex, {
+          source_key: 'a',
+          target_entity_ref: 'component:default/a',
+        });
+
+        await db.transaction(async tx => {
+          await db.replaceUnprocessedEntities(tx, {
+            type: 'full',
+            sourceKey: 'a',
+            items: [],
+          });
+        });
+
+        const state = await knex<DbRefreshStateRow>('refresh_state').select();
+        expect(state).toEqual([]);
+      },
     );
   });
 });

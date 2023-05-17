@@ -10,10 +10,10 @@ import { AsyncState } from 'react-use/lib/useAsync';
 import { AutocompleteProps } from '@material-ui/lab';
 import { Extension } from '@backstage/core-plugin-api';
 import { ForwardRefExoticComponent } from 'react';
-import { InputBaseProps } from '@material-ui/core';
 import { JsonObject } from '@backstage/types';
 import { JsonValue } from '@backstage/types';
 import { LinkProps } from '@backstage/core-components';
+import { ListItemProps } from '@material-ui/core';
 import { ListItemTextProps } from '@material-ui/core';
 import { ListProps } from '@material-ui/core';
 import { PropsWithChildren } from 'react';
@@ -25,6 +25,7 @@ import { SearchDocument } from '@backstage/plugin-search-common';
 import { SearchQuery } from '@backstage/plugin-search-common';
 import { SearchResult as SearchResult_2 } from '@backstage/plugin-search-common';
 import { SearchResultSet } from '@backstage/plugin-search-common';
+import { TextFieldProps } from '@material-ui/core/TextField';
 import { TypographyProps } from '@material-ui/core';
 
 // @public (undocumented)
@@ -55,14 +56,13 @@ export type DefaultResultListItemProps = {
   highlight?: ResultHighlight;
   rank?: number;
   lineClamp?: number;
+  toggleModal?: () => void;
 };
 
 // @public (undocumented)
-export const HighlightedSearchResultText: ({
-  text,
-  preTag,
-  postTag,
-}: HighlightedSearchResultTextProps) => JSX.Element;
+export const HighlightedSearchResultText: (
+  props: HighlightedSearchResultTextProps,
+) => JSX.Element;
 
 // @public
 export type HighlightedSearchResultTextProps = {
@@ -98,14 +98,9 @@ export type SearchAutocompleteComponent = <Option>(
 ) => JSX.Element;
 
 // @public
-export const SearchAutocompleteDefaultOption: ({
-  icon,
-  primaryText,
-  primaryTextTypographyProps,
-  secondaryText,
-  secondaryTextTypographyProps,
-  disableTextTypography,
-}: SearchAutocompleteDefaultOptionProps) => JSX.Element;
+export const SearchAutocompleteDefaultOption: (
+  props: SearchAutocompleteDefaultOptionProps,
+) => JSX.Element;
 
 // @public
 export type SearchAutocompleteDefaultOptionProps = {
@@ -141,12 +136,13 @@ export const SearchBar: ForwardRefExoticComponent<SearchBarProps>;
 export const SearchBarBase: ForwardRefExoticComponent<SearchBarBaseProps>;
 
 // @public
-export type SearchBarBaseProps = Omit<InputBaseProps, 'onChange'> & {
+export type SearchBarBaseProps = Omit<TextFieldProps, 'onChange'> & {
   debounceTime?: number;
   clearButton?: boolean;
   onClear?: () => void;
   onSubmit?: () => void;
   onChange: (value: string) => void;
+  endAdornment?: React_2.ReactNode;
 };
 
 // @public
@@ -191,7 +187,7 @@ export type SearchContextValue = {
 
 // @public (undocumented)
 export const SearchFilter: {
-  ({ component: Element, ...props }: SearchFilterWrapperProps): JSX.Element;
+  (props: SearchFilterWrapperProps): JSX.Element;
   Checkbox(
     props: Omit<SearchFilterWrapperProps, 'component'> &
       SearchFilterComponentProps,
@@ -232,6 +228,7 @@ export type SearchPaginationBaseProps = {
   className?: string;
   total?: number;
   cursor?: string;
+  hasNextPage?: boolean;
   onCursorChange?: (pageCursor: string) => void;
   limit?: number;
   limitLabel?: ReactNode;
@@ -262,7 +259,11 @@ export type SearchPaginationLimitText = (params: {
 // @public
 export type SearchPaginationProps = Omit<
   SearchPaginationBaseProps,
-  'pageLimit' | 'onPageLimitChange' | 'pageCursor' | 'onPageCursorChange'
+  | 'pageLimit'
+  | 'onLimitChange'
+  | 'pageCursor'
+  | 'onPageCursorChange'
+  | 'hasNextPage'
 >;
 
 // @public
@@ -390,6 +391,16 @@ export type SearchResultListItemExtensionOptions<
   component: () => Promise<Component>;
   predicate?: (result: SearchResult_2) => boolean;
 };
+
+// @public
+export type SearchResultListItemExtensionProps<Props extends {} = {}> = Props &
+  PropsWithChildren<
+    {
+      rank?: number;
+      result?: SearchDocument;
+      noTrack?: boolean;
+    } & Omit<ListItemProps, 'button'>
+  >;
 
 // @public
 export const SearchResultListItemExtensions: (

@@ -15,6 +15,7 @@
  */
 
 import { PluginDatabaseManager, UrlReader } from '@backstage/backend-common';
+import { PluginTaskScheduler } from '@backstage/backend-tasks';
 import {
   DefaultNamespaceEntityPolicy,
   Entity,
@@ -76,10 +77,10 @@ import { DefaultCatalogRulesEnforcer } from '../ingestion/CatalogRules';
 import { Config } from '@backstage/config';
 import { Logger } from 'winston';
 import { connectEntityProviders } from '../processing/connectEntityProviders';
-import {
-  CatalogPermissionRule,
-  permissionRules as catalogPermissionRules,
-} from '../permissions/rules';
+import { PermissionRuleParams } from '@backstage/plugin-permission-common';
+import { EntitiesSearchFilter } from '../catalog/types';
+import { permissionRules as catalogPermissionRules } from '../permissions/rules';
+import { PermissionRule } from '@backstage/plugin-permission-node';
 import {
   PermissionAuthorizer,
   PermissionEvaluator,
@@ -94,10 +95,19 @@ import { basicEntityFilter } from './request/basicEntityFilter';
 import {
   catalogPermissions,
   RESOURCE_TYPE_CATALOG_ENTITY,
-} from '@backstage/plugin-catalog-common';
+} from '@backstage/plugin-catalog-common/alpha';
 import { AuthorizedLocationService } from './AuthorizedLocationService';
 import { DefaultProviderDatabase } from '../database/DefaultProviderDatabase';
 import { DefaultCatalogDatabase } from '../database/DefaultCatalogDatabase';
+
+/**
+ * This is a duplicate of the alpha `CatalogPermissionRule` type, for use in the stable API.
+ *
+ * @public
+ */
+export type CatalogPermissionRuleInput<
+  TParams extends PermissionRuleParams = PermissionRuleParams,
+> = PermissionRule<Entity, EntitiesSearchFilter, 'catalog-entity', TParams>;
 
 /** @public */
 export type CatalogEnvironment = {
@@ -106,6 +116,7 @@ export type CatalogEnvironment = {
   config: Config;
   reader: UrlReader;
   permissions: PermissionEvaluator | PermissionAuthorizer;
+  scheduler?: PluginTaskScheduler;
 };
 
 /**
@@ -154,7 +165,7 @@ export class CatalogBuilder {
       maxSeconds: 150,
     });
   private locationAnalyzer: LocationAnalyzer | undefined = undefined;
-  private readonly permissionRules: CatalogPermissionRule[];
+  private readonly permissionRules: CatalogPermissionRuleInput[];
   private allowedLocationType: string[];
   private legacySingleProcessorValidation = false;
 
@@ -379,11 +390,10 @@ export class CatalogBuilder {
    * {@link @backstage/plugin-permission-node#PermissionRule}.
    *
    * @param permissionRules - Additional permission rules
-   * @alpha
    */
   addPermissionRules(
     ...permissionRules: Array<
-      CatalogPermissionRule | Array<CatalogPermissionRule>
+      CatalogPermissionRuleInput | Array<CatalogPermissionRuleInput>
     >
   ) {
     this.permissionRules.push(...permissionRules.flat());
@@ -416,7 +426,7 @@ export class CatalogBuilder {
     processingEngine: CatalogProcessingEngine;
     router: Router;
   }> {
-    const { config, database, logger, permissions } = this.env;
+    const { config, database, logger, permissions, scheduler } = this.env;
 
     const policy = this.buildEntityPolicy();
     const processors = this.buildProcessors();
@@ -453,10 +463,11 @@ export class CatalogBuilder {
       legacySingleProcessorValidation: this.legacySingleProcessorValidation,
     });
     const stitcher = new Stitcher(dbClient, logger);
-    const unauthorizedEntitiesCatalog = new DefaultEntitiesCatalog(
-      dbClient,
+    const unauthorizedEntitiesCatalog = new DefaultEntitiesCatalog({
+      database: dbClient,
+      logger,
       stitcher,
-    );
+    });
 
     let permissionEvaluator: PermissionEvaluator;
     if ('authorizeConditional' in permissions) {
@@ -508,17 +519,19 @@ export class CatalogBuilder {
       provider => provider.getProviderName(),
     );
 
-    const processingEngine = new DefaultCatalogProcessingEngine(
+    const processingEngine = new DefaultCatalogProcessingEngine({
+      config,
+      scheduler,
       logger,
       processingDatabase,
       orchestrator,
       stitcher,
-      () => createHash('sha1'),
-      1000,
-      event => {
+      createHash: () => createHash('sha1'),
+      pollingIntervalMs: 1000,
+      onProcessingError: event => {
         this.onProcessingError?.(event);
       },
-    );
+    });
 
     const locationAnalyzer =
       this.locationAnalyzer ??
@@ -590,15 +603,27 @@ export class CatalogBuilder {
       ...this.placeholderResolvers,
     };
 
-    // These are always there no matter what
+    // The placeholder is always there no matter what
     const processors: CatalogProcessor[] = [
       new PlaceholderProcessor({
         resolvers: placeholderResolvers,
         reader,
         integrations,
       }),
-      new BuiltinKindsEntityProcessor(),
     ];
+
+    const builtinKindsEntityProcessor = new BuiltinKindsEntityProcessor();
+    // If the user adds a processor named 'BuiltinKindsEntityProcessor',
+    //   skip inclusion of the catalog-backend version.
+    if (
+      !this.processors.some(
+        processor =>
+          processor.getProcessorName() ===
+          builtinKindsEntityProcessor.getProcessorName(),
+      )
+    ) {
+      processors.push(builtinKindsEntityProcessor);
+    }
 
     // These are only added unless the user replaced them all
     if (!this.processorsReplace) {

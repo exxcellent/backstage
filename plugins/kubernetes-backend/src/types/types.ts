@@ -25,10 +25,11 @@ import type {
   KubernetesRequestBody,
   ObjectsByEntityResponse,
 } from '@backstage/plugin-kubernetes-common';
+import { Config } from '@backstage/config';
 
 /**
  *
- * @alpha
+ * @public
  */
 export interface ObjectFetchParams {
   serviceId: string;
@@ -46,7 +47,7 @@ export interface ObjectFetchParams {
 /**
  * Fetches information from a kubernetes cluster using the cluster details object to target a specific cluster
  *
- * @alpha
+ * @public
  */
 export interface KubernetesFetcher {
   fetchObjectsForService(
@@ -55,12 +56,13 @@ export interface KubernetesFetcher {
   fetchPodMetricsByNamespaces(
     clusterDetails: ClusterDetails,
     namespaces: Set<string>,
+    labelSelector?: string,
   ): Promise<FetchResponseWrapper>;
 }
 
 /**
  *
- * @alpha
+ * @public
  */
 export interface FetchResponseWrapper {
   errors: KubernetesFetchError[];
@@ -69,7 +71,7 @@ export interface FetchResponseWrapper {
 
 /**
  *
- * @alpha
+ * @public
  */
 export interface ObjectToFetch {
   objectType: KubernetesObjectTypes;
@@ -80,7 +82,7 @@ export interface ObjectToFetch {
 
 /**
  *
- * @alpha
+ * @public
  */
 export interface CustomResource extends ObjectToFetch {
   objectType: 'customresources';
@@ -88,7 +90,7 @@ export interface CustomResource extends ObjectToFetch {
 
 /**
  *
- * @alpha
+ * @public
  */
 export type KubernetesObjectTypes =
   | 'pods'
@@ -104,10 +106,12 @@ export type KubernetesObjectTypes =
   | 'customresources'
   | 'statefulsets'
   | 'daemonsets';
+// If updating this list, also make sure to update
+// `objectTypes` and `apiVersionOverrides` in config.d.ts!
 
 /**
  * Used to load cluster details from different sources
- * @alpha
+ * @public
  */
 export interface KubernetesClustersSupplier {
   /**
@@ -120,7 +124,7 @@ export interface KubernetesClustersSupplier {
 }
 
 /**
- * @alpha
+ * @public
  */
 export interface ServiceLocatorRequestContext {
   objectTypesToFetch: Set<ObjectToFetch>;
@@ -129,7 +133,7 @@ export interface ServiceLocatorRequestContext {
 
 /**
  * Used to locate which cluster(s) a service is running on
- * @alpha
+ * @public
  */
 export interface KubernetesServiceLocator {
   getClustersByEntity(
@@ -140,13 +144,13 @@ export interface KubernetesServiceLocator {
 
 /**
  *
- * @alpha
+ * @public
  */
 export type ServiceLocatorMethod = 'multiTenant' | 'http'; // TODO implement http
 
 /**
  *
- * @alpha
+ * @public
  */
 export interface ClusterDetails {
   /**
@@ -209,25 +213,25 @@ export interface ClusterDetails {
 
 /**
  *
- * @alpha
+ * @public
  */
 export interface GKEClusterDetails extends ClusterDetails {}
 
 /**
  *
- * @alpha
+ * @public
  */
 export interface AzureClusterDetails extends ClusterDetails {}
 
 /**
  *
- * @alpha
+ * @public
  */
 export interface ServiceAccountClusterDetails extends ClusterDetails {}
 
 /**
  *
- * @alpha
+ * @public
  */
 export interface AWSClusterDetails extends ClusterDetails {
   assumeRole?: string;
@@ -236,10 +240,11 @@ export interface AWSClusterDetails extends ClusterDetails {
 
 /**
  *
- * @alpha
+ * @public
  */
 export interface KubernetesObjectsProviderOptions {
   logger: Logger;
+  config: Config;
   fetcher: KubernetesFetcher;
   serviceLocator: KubernetesServiceLocator;
   customResources: CustomResource[];
@@ -248,13 +253,13 @@ export interface KubernetesObjectsProviderOptions {
 
 /**
  *
- * @alpha
+ * @public
  */
 export type ObjectsByEntityRequest = KubernetesRequestBody;
 
 /**
  *
- * @alpha
+ * @public
  */
 export interface KubernetesObjectsByEntity {
   entity: Entity;
@@ -263,7 +268,7 @@ export interface KubernetesObjectsByEntity {
 
 /**
  *
- * @alpha
+ * @public
  */
 export interface CustomResourcesByEntity extends KubernetesObjectsByEntity {
   customResources: CustomResourceMatcher[];
@@ -271,7 +276,7 @@ export interface CustomResourcesByEntity extends KubernetesObjectsByEntity {
 
 /**
  *
- * @alpha
+ * @public
  */
 export interface KubernetesObjectsProvider {
   getKubernetesObjectsByEntity(

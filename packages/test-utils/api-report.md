@@ -26,7 +26,6 @@ import { JsonValue } from '@backstage/types';
 import { MatcherFunction } from '@testing-library/react';
 import { Observable } from '@backstage/types';
 import { PermissionApi } from '@backstage/plugin-permission-react';
-import { PropsWithChildren } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { RenderOptions } from '@testing-library/react';
@@ -167,11 +166,6 @@ export class MockPermissionApi implements PermissionApi {
   ): Promise<EvaluatePermissionResponse>;
 }
 
-// @alpha
-export const MockPluginProvider: ({
-  children,
-}: PropsWithChildren<{}>) => JSX.Element;
-
 // @public
 export class MockStorageApi implements StorageApi {
   // (undocumented)
@@ -179,7 +173,9 @@ export class MockStorageApi implements StorageApi {
   // (undocumented)
   forBucket(name: string): StorageApi;
   // (undocumented)
-  observe$<T>(key: string): Observable<StorageValueSnapshot<T>>;
+  observe$<T extends JsonValue>(
+    key: string,
+  ): Observable<StorageValueSnapshot<T>>;
   // (undocumented)
   remove(key: string): Promise<void>;
   // (undocumented)

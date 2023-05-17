@@ -13,32 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import React, { KeyboardEvent, useRef, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  makeStyles,
-  Paper,
-  useTheme,
-} from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import BuildIcon from '@material-ui/icons/Build';
-import LaunchIcon from '@material-ui/icons/Launch';
-import {
-  CatalogIcon,
-  DocsIcon,
-  Link,
-  useContent,
-} from '@backstage/core-components';
+import { CatalogIcon, DocsIcon, Link } from '@backstage/core-components';
 import { useApi, useRouteRef } from '@backstage/core-plugin-api';
-import { CatalogSearchResultListItem } from '@internal/plugin-catalog-customized';
 import {
-  catalogApiRef,
   CATALOG_FILTER_EXISTS,
+  catalogApiRef,
 } from '@backstage/plugin-catalog-react';
 import { ToolSearchResultListItem } from '@backstage/plugin-explore';
 import { searchPlugin, SearchType } from '@backstage/plugin-search';
@@ -50,12 +29,38 @@ import {
   useSearch,
 } from '@backstage/plugin-search-react';
 import { TechDocsSearchResultListItem } from '@backstage/plugin-techdocs';
+import { CatalogSearchResultListItem } from '@internal/plugin-catalog-customized';
+import {
+  Box,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  makeStyles,
+} from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+import BuildIcon from '@material-ui/icons/Build';
+import CloseIcon from '@material-ui/icons/Close';
+import React, { KeyboardEvent, useCallback, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
+  dialogTitle: {
+    gap: theme.spacing(1),
+    display: 'grid',
+    alignItems: 'center',
+    gridTemplateColumns: '1fr auto',
+    '&> button': {
+      marginTop: theme.spacing(1),
+    },
+  },
   container: {
     borderRadius: 30,
     display: 'flex',
     height: '2.4em',
+    padding: theme.spacing(1),
   },
   filter: {
     '& + &': {
@@ -78,9 +83,6 @@ const rootRouteRef = searchPlugin.routes.root;
 export const SearchModal = ({ toggleModal }: { toggleModal: () => void }) => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const { transitions } = useTheme();
-  const { focusContent } = useContent();
-
   const catalogApi = useApi(catalogApiRef);
 
   const { term, types } = useSearch();
@@ -91,31 +93,30 @@ export const SearchModal = ({ toggleModal }: { toggleModal: () => void }) => {
     searchBarRef?.current?.focus();
   });
 
-  const handleSearchResultClick = useCallback(() => {
-    toggleModal();
-    setTimeout(focusContent, transitions.duration.leavingScreen);
-  }, [toggleModal, focusContent, transitions]);
-
   const handleSearchBarKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (e: KeyboardEvent<HTMLDivElement | HTMLTextAreaElement>) => {
       if (e.key === 'Enter') {
-        handleSearchResultClick();
+        toggleModal();
         navigate(searchPagePath);
       }
     },
-    [navigate, searchPagePath, handleSearchResultClick],
+    [navigate, searchPagePath, toggleModal],
   );
 
   return (
     <>
       <DialogTitle>
-        <Paper className={classes.container}>
+        <Box className={classes.dialogTitle}>
           <SearchBar
             className={classes.input}
             inputProps={{ ref: searchBarRef }}
             onKeyDown={handleSearchBarKeyDown}
           />
-        </Paper>
+
+          <IconButton aria-label="close" onClick={toggleModal}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
       </DialogTitle>
       <DialogContent>
         <Grid container direction="column">
@@ -187,23 +188,20 @@ export const SearchModal = ({ toggleModal }: { toggleModal: () => void }) => {
               alignItems="center"
             >
               <Grid item>
-                <Link to={searchPagePath} onClick={handleSearchResultClick}>
-                  <Typography
-                    component="span"
-                    className={classes.viewResultsLink}
-                  >
-                    View Full Results
-                  </Typography>
-                  <LaunchIcon color="primary" />
-                </Link>
+                <Button
+                  to={searchPagePath}
+                  onClick={toggleModal}
+                  endIcon={<ArrowForwardIcon />}
+                  component={Link}
+                  color="primary"
+                >
+                  View Full Results
+                </Button>
               </Grid>
             </Grid>
           </Grid>
           <Grid item xs>
-            <SearchResult
-              onClick={handleSearchResultClick}
-              onKeyDown={handleSearchResultClick}
-            >
+            <SearchResult>
               <CatalogSearchResultListItem icon={<CatalogIcon />} />
               <TechDocsSearchResultListItem icon={<DocsIcon />} />
               <ToolSearchResultListItem icon={<BuildIcon />} />

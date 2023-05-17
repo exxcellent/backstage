@@ -16,15 +16,20 @@
 
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import useAsync from 'react-use/lib/useAsync';
+
+import groupBy from 'lodash/groupBy';
+
 import {
   Content,
   ContentHeader,
+  InfoCard,
   MissingAnnotationEmptyState,
   Progress,
   SupportButton,
   WarningPanel,
 } from '@backstage/core-components';
-import { useApi, useRouteRef } from '@backstage/core-plugin-api';
+import { configApiRef, useApi, useRouteRef } from '@backstage/core-plugin-api';
 import { scmIntegrationsApiRef } from '@backstage/integration-react';
 import {
   AdrFilePathFilterFn,
@@ -35,25 +40,118 @@ import {
 } from '@backstage/plugin-adr-common';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import {
+  Box,
+  Chip,
+  Collapse,
   Grid,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
   makeStyles,
   Theme,
   Typography,
 } from '@material-ui/core';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import FolderIcon from '@material-ui/icons/Folder';
 
+import { adrApiRef, AdrFileInfo } from '../../api';
 import { rootRouteRef } from '../../routes';
 import { AdrContentDecorator, AdrReader } from '../AdrReader';
-import { adrApiRef } from '../../api';
-import useAsync from 'react-use/lib/useAsync';
 
 const useStyles = makeStyles((theme: Theme) => ({
   adrMenu: {
     backgroundColor: theme.palette.background.paper,
   },
+  adrContainerTitle: {
+    color: theme.palette.grey[700],
+    marginBottom: theme.spacing(1),
+  },
+  adrChip: {
+    position: 'absolute',
+    right: 0,
+  },
 }));
+
+const AdrListContainer = (props: {
+  adrs: AdrFileInfo[];
+  selectedAdr: string;
+  title: string;
+}) => {
+  const { adrs, selectedAdr, title } = props;
+  const classes = useStyles();
+  const rootLink = useRouteRef(rootRouteRef);
+  const [open, setOpen] = React.useState(true);
+
+  const getChipColor = (status: string) => {
+    switch (status) {
+      case 'accepted':
+        return 'primary';
+      case 'rejected':
+      case 'deprecated':
+        return 'secondary';
+      default:
+        return 'default';
+    }
+  };
+
+  const handleClick = () => {
+    setOpen(!open);
+  };
+
+  return (
+    <>
+      {title && (
+        <ListItem
+          button
+          className={classes.adrContainerTitle}
+          onClick={handleClick}
+        >
+          <ListItemIcon>
+            <FolderIcon />
+          </ListItemIcon>
+          <ListItemText primary={title} />
+          {open ? <ExpandLess /> : <ExpandMore />}
+        </ListItem>
+      )}
+      <Collapse in={open} timeout="auto" unmountOnExit>
+        <List dense>
+          {adrs.map((adr, idx) => (
+            <ListItem
+              button
+              component={Link}
+              key={idx}
+              selected={selectedAdr === adr.path}
+              to={`${rootLink()}?record=${adr.path}`}
+            >
+              <ListItemText
+                primary={adr.title ?? adr?.name.replace(/\.md$/, '')}
+                primaryTypographyProps={{
+                  style: { whiteSpace: 'normal' },
+                }}
+                secondary={
+                  <Box>
+                    {adr.date}
+                    {adr.status && (
+                      <Chip
+                        color={getChipColor(adr.status)}
+                        label={adr.status}
+                        size="small"
+                        variant="outlined"
+                        className={classes.adrChip}
+                      />
+                    )}
+                  </Box>
+                }
+              />
+            </ListItem>
+          ))}
+        </List>
+      </Collapse>
+    </>
+  );
+};
 
 /**
  * Component for browsing ADRs on an entity page.
@@ -66,12 +164,14 @@ export const EntityAdrContent = (props: {
   const { contentDecorators, filePathFilterFn } = props;
   const classes = useStyles();
   const { entity } = useEntity();
-  const rootLink = useRouteRef(rootRouteRef);
-  const [adrList, setAdrList] = useState<string[]>([]);
+  const [adrList, setAdrList] = useState<AdrFileInfo[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const scmIntegrations = useApi(scmIntegrationsApiRef);
   const adrApi = useApi(adrApiRef);
   const entityHasAdrs = isAdrAvailable(entity);
+
+  const config = useApi(configApiRef);
+  const appSupportConfigured = config?.getOptionalConfig('app.support');
 
   const { value, loading, error } = useAsync(async () => {
     const url = getAdrLocationUrl(entity, scmIntegrations);
@@ -79,10 +179,15 @@ export const EntityAdrContent = (props: {
   }, [entity, scmIntegrations]);
 
   const selectedAdr =
-    adrList.find(adr => adr === searchParams.get('record')) ?? '';
+    adrList.find(adr => adr.path === searchParams.get('record'))?.path ?? '';
+
+  const adrSubDirectoryFunc = (adr: AdrFileInfo) => {
+    return adr.path.split('/').slice(0, -1).join('/');
+  };
+
   useEffect(() => {
     if (adrList.length && !selectedAdr) {
-      searchParams.set('record', adrList[0]);
+      searchParams.set('record', adrList[0].path);
       setSearchParams(searchParams, { replace: true });
     }
   });
@@ -92,23 +197,25 @@ export const EntityAdrContent = (props: {
       return;
     }
 
-    const adrs = value.data
-      .filter(
-        (item: { type: string; name: string }) =>
-          item.type === 'file' &&
-          (filePathFilterFn
-            ? filePathFilterFn(item.name)
-            : madrFilePathFilter(item.name)),
-      )
-      .map(({ name }: { name: string }) => name);
+    const adrs: AdrFileInfo[] = value.data.filter(
+      (item: AdrFileInfo) =>
+        item.type === 'file' &&
+        (filePathFilterFn
+          ? filePathFilterFn(item.path)
+          : madrFilePathFilter(item.path)),
+    );
 
     setAdrList(adrs);
   }, [filePathFilterFn, value]);
 
+  const adrListGrouped = Object.entries(
+    groupBy(adrList, adrSubDirectoryFunc),
+  ).sort();
+
   return (
     <Content>
       <ContentHeader title="Architecture Decision Records">
-        <SupportButton />
+        {appSupportConfigured && <SupportButton />}
       </ContentHeader>
 
       {!entityHasAdrs && (
@@ -127,22 +234,18 @@ export const EntityAdrContent = (props: {
         (adrList.length ? (
           <Grid container direction="row">
             <Grid item xs={3}>
-              <List className={classes.adrMenu} dense>
-                {adrList.map((adr, idx) => (
-                  <ListItem
-                    key={idx}
-                    button
-                    component={Link}
-                    to={`${rootLink()}?record=${adr}`}
-                    selected={selectedAdr === adr}
-                  >
-                    <ListItemText
-                      secondaryTypographyProps={{ noWrap: true }}
-                      secondary={adr.replace(/\.md$/, '')}
+              <InfoCard>
+                <List className={classes.adrMenu} dense>
+                  {adrListGrouped.map(([title, adrs], idx) => (
+                    <AdrListContainer
+                      adrs={adrs}
+                      key={idx}
+                      selectedAdr={selectedAdr}
+                      title={title}
                     />
-                  </ListItem>
-                ))}
-              </List>
+                  ))}
+                </List>
+              </InfoCard>
             </Grid>
             <Grid item xs={9}>
               <AdrReader adr={selectedAdr} decorators={contentDecorators} />

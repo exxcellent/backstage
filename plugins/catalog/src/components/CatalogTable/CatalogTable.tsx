@@ -16,6 +16,7 @@
 import {
   ANNOTATION_EDIT_URL,
   ANNOTATION_VIEW_URL,
+  Entity,
   RELATION_OWNED_BY,
   RELATION_PART_OF,
 } from '@backstage/catalog-model';
@@ -62,6 +63,16 @@ const YellowStar = withStyles({
   },
 })(Star);
 
+const refCompare = (a: Entity, b: Entity) => {
+  const toRef = (entity: Entity) =>
+    entity.metadata.title ||
+    humanizeEntityRef(entity, {
+      defaultKind: 'Component',
+    });
+
+  return toRef(a).localeCompare(toRef(b));
+};
+
 /** @public */
 export const CatalogTable = (props: CatalogTableProps) => {
   const { columns, actions, tableOptions, subtitle, emptyContent } = props;
@@ -78,6 +89,12 @@ export const CatalogTable = (props: CatalogTableProps) => {
     ];
 
     function createEntitySpecificColumns(): TableColumn<CatalogTableRow>[] {
+      const baseColumns = [
+        columnFactories.createSystemColumn(),
+        columnFactories.createOwnerColumn(),
+        columnFactories.createSpecTypeColumn(),
+        columnFactories.createSpecLifecycleColumn(),
+      ];
       switch (filters.kind?.value) {
         case 'user':
           return [];
@@ -93,15 +110,14 @@ export const CatalogTable = (props: CatalogTableProps) => {
             columnFactories.createSpecTargetsColumn(),
           ];
         default:
-          return [
-            columnFactories.createSystemColumn(),
-            columnFactories.createOwnerColumn(),
-            columnFactories.createSpecTypeColumn(),
-            columnFactories.createSpecLifecycleColumn(),
-          ];
+          return entities.every(
+            entity => entity.metadata.namespace === 'default',
+          )
+            ? baseColumns
+            : [...baseColumns, columnFactories.createNamespaceColumn()];
       }
     }
-  }, [filters.kind?.value]);
+  }, [filters.kind?.value, entities]);
 
   const showTypeColumn = filters.type === undefined;
   // TODO(timbonicus): remove the title from the CatalogTable once using EntitySearchBar
@@ -177,7 +193,7 @@ export const CatalogTable = (props: CatalogTableProps) => {
     },
   ];
 
-  const rows = entities.map(entity => {
+  const rows = entities.sort(refCompare).map(entity => {
     const partOfSystemRelations = getEntityRelations(entity, RELATION_PART_OF, {
       kind: 'system',
     });

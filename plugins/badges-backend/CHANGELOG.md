@@ -1,5 +1,178 @@
 # @backstage/plugin-badges-backend
 
+## 0.2.0
+
+### Minor Changes
+
+- a0108c49774: Fixing badges-backend plugin to get a token from the TokenManager instead of parsing the request header. Hence, it's now possible to disable the authMiddleware for the badges-backend plugin to expose publicly the badges.
+
+  Implementing an obfuscation feature to protect an open badges endpoint from being enumerated. The feature is disabled by default and the change is compatible with the previous version.
+
+  **BREAKING**: `createRouter` now require that `tokenManager`, `logger`, and `identityApi`, are passed in as options.
+
+### Patch Changes
+
+- 0cd552c28d8: Removed some unused dependencies
+- Updated dependencies
+  - @backstage/backend-common@0.18.5
+  - @backstage/plugin-auth-node@0.2.14
+  - @backstage/catalog-client@1.4.1
+  - @backstage/catalog-model@1.3.0
+  - @backstage/config@1.0.7
+  - @backstage/errors@1.1.5
+
+## 0.2.0-next.2
+
+### Minor Changes
+
+- a0108c49774: Fixing badges-backend plugin to get a token from the TokenManager instead of parsing the request header. Hence, it's now possible to disable the authMiddleware for the badges-backend plugin to expose publicly the badges.
+
+  Implementing an obfuscation feature to protect an open badges endpoint from being enumerated. The feature is disabled by default and the change is compatible with the previous version.
+
+  **BREAKING**: `createRouter` now require that `tokenManager`, `logger`, and `identityApi`, are passed in as options.
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/config@1.0.7
+
+## 0.1.39-next.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/backend-common@0.18.5-next.1
+  - @backstage/config@1.0.7
+
+## 0.1.39-next.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/backend-common@0.18.5-next.0
+  - @backstage/catalog-client@1.4.1
+  - @backstage/catalog-model@1.3.0
+  - @backstage/config@1.0.7
+  - @backstage/errors@1.1.5
+
+## 0.1.38
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/backend-common@0.18.4
+  - @backstage/catalog-client@1.4.1
+  - @backstage/catalog-model@1.3.0
+  - @backstage/config@1.0.7
+  - @backstage/errors@1.1.5
+
+## 0.1.38-next.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/catalog-model@1.3.0-next.0
+  - @backstage/backend-common@0.18.4-next.2
+  - @backstage/catalog-client@1.4.1-next.1
+  - @backstage/config@1.0.7
+  - @backstage/errors@1.1.5
+
+## 0.1.38-next.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/backend-common@0.18.4-next.2
+  - @backstage/catalog-client@1.4.1-next.0
+  - @backstage/catalog-model@1.2.1
+  - @backstage/config@1.0.7
+  - @backstage/errors@1.1.5
+
+## 0.1.38-next.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/backend-common@0.18.4-next.1
+  - @backstage/catalog-client@1.4.0
+  - @backstage/catalog-model@1.2.1
+  - @backstage/config@1.0.7
+  - @backstage/errors@1.1.5
+
+## 0.1.38-next.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/backend-common@0.18.4-next.0
+  - @backstage/config@1.0.7
+  - @backstage/catalog-client@1.4.0
+  - @backstage/catalog-model@1.2.1
+  - @backstage/errors@1.1.5
+
+## 0.1.37
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/catalog-client@1.4.0
+  - @backstage/backend-common@0.18.3
+  - @backstage/errors@1.1.5
+  - @backstage/catalog-model@1.2.1
+  - @backstage/config@1.0.7
+
+## 0.1.37-next.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/backend-common@0.18.3-next.2
+  - @backstage/config@1.0.7-next.0
+
+## 0.1.37-next.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/errors@1.1.5-next.0
+  - @backstage/backend-common@0.18.3-next.1
+  - @backstage/catalog-client@1.4.0-next.1
+  - @backstage/config@1.0.7-next.0
+  - @backstage/catalog-model@1.2.1-next.1
+
+## 0.1.37-next.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/catalog-client@1.4.0-next.0
+  - @backstage/backend-common@0.18.3-next.0
+  - @backstage/catalog-model@1.2.1-next.0
+  - @backstage/config@1.0.6
+  - @backstage/errors@1.1.4
+
+## 0.1.36
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/backend-common@0.18.2
+  - @backstage/catalog-model@1.2.0
+  - @backstage/catalog-client@1.3.1
+  - @backstage/config@1.0.6
+  - @backstage/errors@1.1.4
+
+## 0.1.36-next.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/backend-common@0.18.2-next.2
+  - @backstage/catalog-model@1.2.0-next.1
+  - @backstage/catalog-client@1.3.1-next.1
+  - @backstage/config@1.0.6
+  - @backstage/errors@1.1.4
+
 ## 0.1.36-next.1
 
 ### Patch Changes

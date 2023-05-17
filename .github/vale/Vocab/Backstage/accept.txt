@@ -9,6 +9,7 @@ Airbrake
 Airbrakes
 Alaria
 Alef
+allowlisted
 Anddddd
 Apdex
 api
@@ -23,6 +24,7 @@ Avro
 backend's
 backported
 backporting
+BEPs
 Bigtable
 Billett
 bitbucket
@@ -31,6 +33,7 @@ Blackbox
 bool
 boolean
 Brex
+bugfixes
 builtins
 callout
 CDNs
@@ -79,6 +82,7 @@ Debounce
 debuggability
 declaratively
 deduplicated
+deliverables
 dependabot
 deps
 destructured
@@ -95,6 +99,7 @@ dockerfiles
 Dockerize
 dockerode
 Docusaurus
+Dominik
 DOMPurify
 don'ts
 dynatrace
@@ -119,6 +124,7 @@ Firekube
 Firestore
 Fiverr
 Francesco
+Frontside
 gerrit
 Gerrit
 gitbeaker
@@ -138,6 +144,7 @@ Hackathons
 haproxy
 hardcoded
 Helidon
+Henneke
 Heroku
 hoc
 horizontalpodautoscalers
@@ -152,6 +159,7 @@ img
 incentivised
 Indal
 indexable
+ingestors
 inlined
 inlinehilite
 integrator's
@@ -167,17 +175,20 @@ jsonnet
 jsx
 JWTs
 Kaewkasi
+Kaswell
 Keyv
 Knex
 KPIs
+Kuang
 kubectl
 kubernetes
-kubernetes
+Lainfiesta
 ldap
 learnings
 Leasot
 lerna
 Lerna
+lightbox
 limitranges
 LocalStack
 lockdown
@@ -233,9 +244,11 @@ OAuth
 octokit
 oidc
 Okta
+Olausson
 Oldsberg
 onboarding
 Onboarding
+OpenSearch
 OpenShift
 orgs
 padding
@@ -256,6 +269,7 @@ permissioning
 plantuml
 Platformize
 Podman
+posix
 postgres
 postpack
 pre
@@ -302,6 +316,7 @@ scaffolded
 scaffolder
 Scaffolder
 scrollbar
+sdks
 seb
 semlas
 semver
@@ -329,6 +344,8 @@ stdout
 storable
 stringified
 stringify
+subcommand
+subcommands
 subcomponent
 subcomponents
 subfolder
@@ -336,6 +353,7 @@ subfolders
 subheader
 subheaders
 subkey
+subpath
 subroutes
 subtree
 superfences
@@ -357,6 +375,7 @@ templaters
 Templaters
 TFRecord
 theia
+threenager
 thumbsup
 todo
 todos
@@ -375,6 +394,7 @@ transpilers
 truthy
 TSDoc
 typeahead
+Uffizzi
 ui
 unbreak
 Unconference
@@ -393,6 +413,7 @@ validator
 validators
 varchar
 VMware
+Vodafone
 VPCs
 VSCode
 Wayfair
@@ -412,8 +433,3 @@ zod
 Zolotusky
 zoomable
 zsh
-Lainfiesta
-allowlisted
-Dominik
-Henneke
-Kuang

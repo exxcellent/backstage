@@ -24,10 +24,11 @@ import { TemplateParameterSchema } from '../types';
  * @public
  */
 export type ScaffolderTaskStatus =
+  | 'cancelled'
+  | 'completed'
+  | 'failed'
   | 'open'
   | 'processing'
-  | 'failed'
-  | 'completed'
   | 'skipped';
 
 /**
@@ -84,8 +85,16 @@ export type ScaffolderOutputLink = {
 };
 
 /** @public */
+export type ScaffolderOutputText = {
+  title?: string;
+  icon?: string;
+  content?: string;
+};
+
+/** @public */
 export type ScaffolderTaskOutput = {
   links?: ScaffolderOutputLink[];
+  text?: ScaffolderOutputText[];
 } & {
   [key: string]: unknown;
 };
@@ -96,7 +105,7 @@ export type ScaffolderTaskOutput = {
  * @public
  */
 export type LogEvent = {
-  type: 'log' | 'completion';
+  type: 'log' | 'completion' | 'cancelled';
   body: {
     message: string;
     stepId?: string;
@@ -195,6 +204,13 @@ export interface ScaffolderApi {
   ): Promise<ScaffolderScaffoldResponse>;
 
   getTask(taskId: string): Promise<ScaffolderTask>;
+
+  /**
+   * Sends a signal to a task broker to cancel the running task by taskId.
+   *
+   * @param taskId - the id of the task
+   */
+  cancelTask(taskId: string): Promise<void>;
 
   listTasks?(options: {
     filterByOwnership: 'owned' | 'all';

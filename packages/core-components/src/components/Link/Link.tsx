@@ -55,6 +55,32 @@ const useStyles = makeStyles(
 
 export const isExternalUri = (uri: string) => /^([a-z+.-]+):/.test(uri);
 
+// See https://github.com/facebook/react/blob/f0cf832e1d0c8544c36aa8b310960885a11a847c/packages/react-dom-bindings/src/shared/sanitizeURL.js
+const scriptProtocolPattern =
+  // eslint-disable-next-line no-control-regex
+  /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
+
+// We install this globally in order to prevent javascript: URL XSS attacks via window.open
+const originalWindowOpen = window.open as typeof window.open & {
+  __backstage?: true;
+};
+if (originalWindowOpen && !originalWindowOpen.__backstage) {
+  const newOpen = function open(
+    this: Window,
+    ...args: Parameters<typeof window.open>
+  ) {
+    const url = String(args[0]);
+    if (scriptProtocolPattern.test(url)) {
+      throw new Error(
+        'Rejected window.open() with a javascript: URL as a security precaution',
+      );
+    }
+    return originalWindowOpen.apply(this, args);
+  };
+  newOpen.__backstage = true;
+  window.open = newOpen;
+}
+
 export type LinkProps = Omit<MaterialLinkProps, 'to'> &
   Omit<RouterLinkProps, 'to'> & {
     to: string;
@@ -144,6 +170,12 @@ export const Link = React.forwardRef<any, LinkProps>(
     const external = isExternalUri(to);
     const newWindow = external && !!/^https?:/.exec(to);
 
+    if (scriptProtocolPattern.test(to)) {
+      throw new Error(
+        'Link component rejected javascript: URL as a security precaution',
+      );
+    }
+
     const handleClick = (event: React.MouseEvent<any, MouseEvent>) => {
       onClick?.(event);
       if (!noTrack) {
@@ -156,6 +188,9 @@ export const Link = React.forwardRef<any, LinkProps>(
       <MaterialLink
         {...(newWindow ? { target: '_blank', rel: 'noopener' } : {})}
         {...props}
+        {...(props['aria-label']
+          ? { 'aria-label': `${props['aria-label']}, Opens in a new window` }
+          : {})}
         ref={ref}
         href={to}
         onClick={handleClick}

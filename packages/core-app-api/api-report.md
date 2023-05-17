@@ -22,8 +22,10 @@ import { BackstageIdentityApi } from '@backstage/core-plugin-api';
 import { BackstageIdentityResponse } from '@backstage/core-plugin-api';
 import { BackstagePlugin } from '@backstage/core-plugin-api';
 import { bitbucketAuthApiRef } from '@backstage/core-plugin-api';
+import { bitbucketServerAuthApiRef } from '@backstage/core-plugin-api';
 import { ComponentType } from 'react';
 import { Config } from '@backstage/config';
+import { ConfigApi } from '@backstage/core-plugin-api';
 import { ConfigReader } from '@backstage/config';
 import { DiscoveryApi } from '@backstage/core-plugin-api';
 import { ErrorApi } from '@backstage/core-plugin-api';
@@ -114,9 +116,11 @@ export const ApiProvider: {
   (props: PropsWithChildren<ApiProviderProps>): JSX.Element;
   propTypes: {
     apis: PropTypes.Validator<
-      PropTypes.InferProps<{
-        get: PropTypes.Validator<(...args: any[]) => any>;
-      }>
+      NonNullable<
+        PropTypes.InferProps<{
+          get: PropTypes.Validator<(...args: any[]) => any>;
+        }>
+      >
     >;
     children: PropTypes.Requireable<PropTypes.ReactNodeLike>;
   };
@@ -263,6 +267,7 @@ export type AuthApiCreateOptions = {
   discoveryApi: DiscoveryApi;
   environment?: string;
   provider?: AuthProviderInfo;
+  configApi?: ConfigApi;
 };
 
 // @public
@@ -279,6 +284,25 @@ export class BitbucketAuth {
   // (undocumented)
   static create(options: OAuthApiCreateOptions): typeof bitbucketAuthApiRef.T;
 }
+
+// @public
+export class BitbucketServerAuth {
+  // (undocumented)
+  static create(
+    options: OAuthApiCreateOptions,
+  ): typeof bitbucketServerAuthApiRef.T;
+}
+
+// @public
+export type BitbucketServerSession = {
+  providerInfo: {
+    accessToken: string;
+    scopes: Set<string>;
+    expiresAt?: Date;
+  };
+  profile: ProfileInfo;
+  backstageIdentity: BackstageIdentityResponse;
+};
 
 // @public
 export type BitbucketSession = {
@@ -387,6 +411,18 @@ export type FlatRoutesProps = {
 };
 
 // @public
+export class FrontendHostDiscovery implements DiscoveryApi {
+  static fromConfig(
+    config: Config,
+    options?: {
+      pathPattern?: string;
+    },
+  ): FrontendHostDiscovery;
+  // (undocumented)
+  getBaseUrl(pluginId: string): Promise<string>;
+}
+
+// @public
 export class GithubAuth {
   // (undocumented)
   static create(options: OAuthApiCreateOptions): typeof githubAuthApiRef.T;
@@ -419,7 +455,26 @@ export class LocalStorageFeatureFlags implements FeatureFlagsApi {
 // @public
 export class MicrosoftAuth {
   // (undocumented)
-  static create(options: OAuthApiCreateOptions): typeof microsoftAuthApiRef.T;
+  static create(options: OAuth2CreateOptions): typeof microsoftAuthApiRef.T;
+  // (undocumented)
+  getAccessToken(
+    scope?: string | string[],
+    options?: AuthRequestOptions,
+  ): Promise<string>;
+  // (undocumented)
+  getBackstageIdentity(
+    options?: AuthRequestOptions,
+  ): Promise<BackstageIdentityResponse | undefined>;
+  // (undocumented)
+  getIdToken(options?: AuthRequestOptions): Promise<string>;
+  // (undocumented)
+  getProfile(options?: AuthRequestOptions): Promise<ProfileInfo | undefined>;
+  // (undocumented)
+  sessionState$(): Observable<SessionState>;
+  // (undocumented)
+  signIn(): Promise<void>;
+  // (undocumented)
+  signOut(): Promise<void>;
 }
 
 // @public
@@ -513,6 +568,7 @@ export class OneLoginAuth {
 
 // @public
 export type OneLoginAuthCreateOptions = {
+  configApi?: ConfigApi;
   discoveryApi: DiscoveryApi;
   oauthRequestApi: OAuthRequestApi;
   environment?: string;

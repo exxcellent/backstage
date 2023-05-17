@@ -25,16 +25,25 @@ import {
 import {
   scaffolderApiRef,
   useTemplateSecrets,
-  Workflow,
   type LayoutOptions,
 } from '@backstage/plugin-scaffolder-react';
-import { NextFieldExtensionOptions } from '@backstage/plugin-scaffolder-react';
+import {
+  FormProps,
+  Workflow,
+  NextFieldExtensionOptions,
+} from '@backstage/plugin-scaffolder-react/alpha';
 import { JsonValue } from '@backstage/types';
-import { type FormProps } from '../types';
-import { nextRouteRef } from '../routes';
-import { scaffolderTaskRouteRef, selectedTemplateRouteRef } from '../../routes';
 import { Header, Page } from '@backstage/core-components';
 
+import {
+  rootRouteRef,
+  scaffolderTaskRouteRef,
+  selectedTemplateRouteRef,
+} from '../../routes';
+
+/**
+ * @alpha
+ */
 export type TemplateWizardPageProps = {
   customFieldExtensions: NextFieldExtensionOptions<any, any>[];
   layouts?: LayoutOptions[];
@@ -42,7 +51,7 @@ export type TemplateWizardPageProps = {
 };
 
 export const TemplateWizardPage = (props: TemplateWizardPageProps) => {
-  const rootRef = useRouteRef(nextRouteRef);
+  const rootRef = useRouteRef(rootRouteRef);
   const taskRoute = useRouteRef(scaffolderTaskRouteRef);
   const { secrets } = useTemplateSecrets();
   const scaffolderApi = useApi(scaffolderApiRef);

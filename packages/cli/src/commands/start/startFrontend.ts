@@ -19,10 +19,10 @@ import chalk from 'chalk';
 import uniq from 'lodash/uniq';
 import { serveBundle } from '../../lib/bundler';
 import { loadCliConfig } from '../../lib/config';
-import { paths } from '../../lib/paths';
+import { PackageGraph } from '@backstage/cli-node';
 import { Lockfile } from '../../lib/versioning';
 import { forbiddenDuplicatesFilter, includedFilter } from '../versions/lint';
-import { PackageGraph } from '../../lib/monorepo';
+import { paths } from '../../lib/paths';
 
 interface StartAppOptions {
   verifyVersions?: boolean;
@@ -30,6 +30,30 @@ interface StartAppOptions {
 
   checksEnabled: boolean;
   configPaths: string[];
+}
+
+function checkReactVersion() {
+  try {
+    // Make sure we're looking at the root of the target repo
+    const reactPkgPath = require.resolve('react/package.json', {
+      paths: [paths.targetRoot],
+    });
+    const reactPkg = require(reactPkgPath);
+    if (reactPkg.version.startsWith('16.')) {
+      console.log(
+        chalk.yellow(
+          `
+⚠️                                                                           ⚠️
+⚠️ You are using React version 16, which is deprecated for use in Backstage. ⚠️
+⚠️ Please upgrade to React 17 by updating your packages/app dependencies.    ⚠️
+⚠️                                                                           ⚠️
+`,
+        ),
+      );
+    }
+  } catch {
+    /* ignored */
+  }
 }
 
 export async function startFrontend(options: StartAppOptions) {
@@ -64,6 +88,8 @@ export async function startFrontend(options: StartAppOptions) {
       );
     }
   }
+
+  checkReactVersion();
 
   const { name } = await fs.readJson(paths.resolveTarget('package.json'));
   const config = await loadCliConfig({
