@@ -1,5 +1,46 @@
 # @backstage/plugin-techdocs-node
 
+## 1.7.2-next.2
+
+### Patch Changes
+
+- 5f2c38c70f5b: Fix SNYK-JS-FASTXMLPARSER-5668858 (`fast-xml-parser`) by upgrading aws-sdk to at least the current latest version.
+- Updated dependencies
+  - @backstage/integration-aws-node@0.1.4-next.1
+  - @backstage/backend-common@0.19.0-next.2
+  - @backstage/catalog-model@1.4.0-next.1
+  - @backstage/config@1.0.7
+  - @backstage/errors@1.2.0-next.0
+  - @backstage/integration@1.5.0-next.0
+  - @backstage/plugin-search-common@1.2.4-next.0
+
+## 1.7.2-next.1
+
+### Patch Changes
+
+- 7d4a09304f67: Use latest techdocs docker image by default. The latest image contains security updates.
+- Updated dependencies
+  - @backstage/backend-common@0.19.0-next.1
+  - @backstage/integration@1.5.0-next.0
+  - @backstage/errors@1.2.0-next.0
+  - @backstage/catalog-model@1.4.0-next.0
+  - @backstage/integration-aws-node@0.1.4-next.0
+  - @backstage/config@1.0.7
+  - @backstage/plugin-search-common@1.2.4-next.0
+
+## 1.7.2-next.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/backend-common@0.18.6-next.0
+  - @backstage/integration@1.4.5
+  - @backstage/integration-aws-node@0.1.3
+  - @backstage/config@1.0.7
+  - @backstage/catalog-model@1.3.0
+  - @backstage/errors@1.1.5
+  - @backstage/plugin-search-common@1.2.3
+
 ## 1.7.1
 
 ### Patch Changes

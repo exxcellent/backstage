@@ -212,6 +212,50 @@ export function createGithubActionsDispatchAction(options: {
 >;
 
 // @public
+export function createGithubDeployKeyAction(options: {
+  integrations: ScmIntegrationRegistry;
+}): TemplateAction_2<
+  {
+    repoUrl: string;
+    publicKey: string;
+    privateKey: string;
+    deployKeyName: string;
+    privateKeySecretName?: string | undefined;
+    token?: string | undefined;
+  },
+  JsonObject
+>;
+
+// @public
+export function createGithubEnvironmentAction(options: {
+  integrations: ScmIntegrationRegistry;
+}): TemplateAction_2<
+  {
+    repoUrl: string;
+    name: string;
+    deploymentBranchPolicy?:
+      | {
+          protected_branches: boolean;
+          custom_branch_policies: boolean;
+        }
+      | undefined;
+    customBranchPolicyNames?: string[] | undefined;
+    environmentVariables?:
+      | {
+          [key: string]: string;
+        }
+      | undefined;
+    secrets?:
+      | {
+          [key: string]: string;
+        }
+      | undefined;
+    token?: string | undefined;
+  },
+  JsonObject
+>;
+
+// @public
 export function createGithubIssuesLabelAction(options: {
   integrations: ScmIntegrationRegistry;
   githubCredentialsProvider?: GithubCredentialsProvider;
@@ -308,6 +352,16 @@ export function createGithubRepoCreateAction(options: {
     hasIssues?: boolean | undefined;
     token?: string | undefined;
     topics?: string[] | undefined;
+    repoVariables?:
+      | {
+          [key: string]: string;
+        }
+      | undefined;
+    secrets?:
+      | {
+          [key: string]: string;
+        }
+      | undefined;
     requireCommitSigning?: boolean | undefined;
   },
   JsonObject
@@ -449,6 +503,22 @@ export function createPublishBitbucketServerAction(options: {
 >;
 
 // @public
+export function createPublishBitbucketServerPullRequestAction(options: {
+  integrations: ScmIntegrationRegistry;
+  config: Config;
+}): TemplateAction_2<
+  {
+    repoUrl: string;
+    title: string;
+    description?: string | undefined;
+    targetBranch?: string | undefined;
+    sourceBranch: string;
+    token?: string | undefined;
+  },
+  JsonObject
+>;
+
+// @public
 export function createPublishGerritAction(options: {
   integrations: ScmIntegrationRegistry;
   config: Config;
@@ -552,6 +622,16 @@ export function createPublishGithubAction(options: {
     hasIssues?: boolean | undefined;
     token?: string | undefined;
     topics?: string[] | undefined;
+    repoVariables?:
+      | {
+          [key: string]: string;
+        }
+      | undefined;
+    secrets?:
+      | {
+          [key: string]: string;
+        }
+      | undefined;
     requiredCommitSigning?: boolean | undefined;
   },
   JsonObject
@@ -564,6 +644,7 @@ export const createPublishGithubPullRequestAction: (
   {
     title: string;
     branchName: string;
+    targetBranchName?: string | undefined;
     description: string;
     repoUrl: string;
     draft?: boolean | undefined;
@@ -606,6 +687,7 @@ export const createPublishGitlabMergeRequestAction: (options: {
     title: string;
     description: string;
     branchName: string;
+    targetBranchName?: string | undefined;
     sourcePath?: string | undefined;
     targetPath?: string | undefined;
     token?: string | undefined;
@@ -752,6 +834,9 @@ export type OctokitWithPullRequestPluginClient = Octokit & {
     data: {
       html_url: string;
       number: number;
+      base: {
+        ref: string;
+      };
     };
   } | null>;
 };

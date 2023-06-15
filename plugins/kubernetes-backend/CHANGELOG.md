@@ -1,5 +1,73 @@
 # @backstage/plugin-kubernetes-backend
 
+## 0.11.1-next.3
+
+### Patch Changes
+
+- 91f39df52d60: K8s proxy HEADER_KUBERNETES_CLUSTER is now optional in single-cluster setups.
+- 5f2c38c70f5b: Fix SNYK-JS-FASTXMLPARSER-5668858 (`fast-xml-parser`) by upgrading aws-sdk to at least the current latest version.
+- eac59a3d0b11: Add ability for `configClusterLocator` to load cluster specific custom resources defined in your `app.config`.
+- Updated dependencies
+  - @backstage/integration-aws-node@0.1.4-next.1
+  - @backstage/backend-common@0.19.0-next.2
+  - @backstage/catalog-model@1.4.0-next.1
+  - @backstage/backend-plugin-api@0.5.3-next.2
+  - @backstage/catalog-client@1.4.2-next.2
+  - @backstage/config@1.0.7
+  - @backstage/errors@1.2.0-next.0
+  - @backstage/plugin-auth-node@0.2.15-next.2
+  - @backstage/plugin-catalog-node@1.3.7-next.2
+  - @backstage/plugin-kubernetes-common@0.6.4-next.1
+  - @backstage/plugin-permission-common@0.7.6-next.0
+  - @backstage/plugin-permission-node@0.7.9-next.2
+
+## 0.11.1-next.2
+
+### Patch Changes
+
+- 4249f4214f9f: Fixed bug in KubernetesProxy where Host header was not propagated, leading to certificate issues
+- 5e4879d80f4d: Fixed wrong `pluginID` in the `kubernetes` alpha backend support, that made the `kubernetes` plugin fail with the new experimental backend.
+- 73cc0deee48a: Add proposed fix dialog for pod errors
+- Updated dependencies
+  - @backstage/config@1.0.7
+  - @backstage/integration-aws-node@0.1.4-next.0
+
+## 0.11.1-next.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/backend-common@0.19.0-next.1
+  - @backstage/errors@1.2.0-next.0
+  - @backstage/backend-plugin-api@0.5.3-next.1
+  - @backstage/catalog-model@1.4.0-next.0
+  - @backstage/plugin-auth-node@0.2.15-next.1
+  - @backstage/plugin-catalog-node@1.3.7-next.1
+  - @backstage/plugin-permission-node@0.7.9-next.1
+  - @backstage/catalog-client@1.4.2-next.1
+  - @backstage/integration-aws-node@0.1.4-next.0
+  - @backstage/plugin-permission-common@0.7.6-next.0
+  - @backstage/plugin-kubernetes-common@0.6.4-next.0
+  - @backstage/config@1.0.7
+
+## 0.11.1-next.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/catalog-client@1.4.2-next.0
+  - @backstage/plugin-catalog-node@1.3.7-next.0
+  - @backstage/backend-common@0.18.6-next.0
+  - @backstage/integration-aws-node@0.1.3
+  - @backstage/config@1.0.7
+  - @backstage/backend-plugin-api@0.5.3-next.0
+  - @backstage/catalog-model@1.3.0
+  - @backstage/errors@1.1.5
+  - @backstage/plugin-auth-node@0.2.15-next.0
+  - @backstage/plugin-kubernetes-common@0.6.3
+  - @backstage/plugin-permission-common@0.7.5
+  - @backstage/plugin-permission-node@0.7.9-next.0
+
 ## 0.11.0
 
 ### Minor Changes

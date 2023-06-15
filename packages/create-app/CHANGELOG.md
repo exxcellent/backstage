@@ -1,5 +1,35 @@
 # @backstage/create-app
 
+## 0.5.2-next.3
+
+### Patch Changes
+
+- Bumped create-app version.
+- Updated dependencies
+  - @backstage/cli-common@0.1.12
+
+## 0.5.2-next.2
+
+### Patch Changes
+
+- Bumped create-app version.
+
+## 0.5.2-next.1
+
+### Patch Changes
+
+- 08f177b91084: Add link from Template entity to the scaffolder launch page for the template in the AboutCard.
+- Updated dependencies
+  - @backstage/cli-common@0.1.12
+
+## 0.5.2-next.0
+
+### Patch Changes
+
+- Bumped create-app version.
+- Updated dependencies
+  - @backstage/cli-common@0.1.12
+
 ## 0.5.1
 
 ### Patch Changes

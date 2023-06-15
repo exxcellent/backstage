@@ -364,6 +364,7 @@ SVGs
 talkdesk
 Talkdesk
 Tanzu
+targetRef
 tasklist
 techdocs
 Telenor
@@ -433,3 +434,5 @@ zod
 Zolotusky
 zoomable
 zsh
+Pulumi
+Lightsail

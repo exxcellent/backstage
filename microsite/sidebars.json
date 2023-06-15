@@ -81,7 +81,8 @@
           "features/software-catalog/extending-the-model",
           "features/software-catalog/external-integrations",
           "features/software-catalog/catalog-customization",
-          "features/software-catalog/software-catalog-api"
+          "features/software-catalog/software-catalog-api",
+          "features/software-catalog/creating-the-catalog-graph"
         ]
       },
       {
@@ -283,6 +284,8 @@
           "auth/microsoft/provider",
           "auth/microsoft/easy-auth",
           "auth/bitbucket/provider",
+          "auth/bitbucketServer/provider",
+          "auth/cloudflare/provider",
           "auth/github/provider",
           "auth/gitlab/provider",
           "auth/google/provider",
@@ -324,7 +327,12 @@
       "deployment/scaling",
       "deployment/docker",
       "deployment/k8s",
-      "deployment/heroku"
+      "deployment/heroku",
+      {
+        "type": "category",
+        "label": "Using Backstage Deploy (alpha)",
+        "items": ["deployment/backstage-deploy/aws-lightsail"]
+      }
     ],
     "Designing for Backstage": [
       "dls/design",

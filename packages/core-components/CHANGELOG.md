@@ -1,5 +1,51 @@
 # @backstage/core-components
 
+## 0.13.2-next.3
+
+### Patch Changes
+
+- 78cbb8ef8aea: Enhance the sidebar item accessibility by using appropriate header semantics.
+- e33beb1f2a8e: Make the documentation pages printable (also handy for exporting to PDF)
+- Updated dependencies
+  - @backstage/config@1.0.7
+  - @backstage/core-plugin-api@1.5.2-next.0
+  - @backstage/errors@1.2.0-next.0
+  - @backstage/theme@0.4.0-next.1
+  - @backstage/version-bridge@1.0.4
+
+## 0.13.2-next.2
+
+### Patch Changes
+
+- 66ae4d8ca380: Added `exact` prop to `SidebarSubmenuItem` which causes it to only highlight if the current location is an exact match.
+- Updated dependencies
+  - @backstage/theme@0.4.0-next.1
+  - @backstage/config@1.0.7
+  - @backstage/core-plugin-api@1.5.2-next.0
+
+## 0.13.2-next.1
+
+### Patch Changes
+
+- 83bdc3a555c1: Replaced usages of `theme.palette.theme.hint` with `theme.palette.text.secondary` as it has been removed in MUI v5
+- Updated dependencies
+  - @backstage/errors@1.2.0-next.0
+  - @backstage/core-plugin-api@1.5.2-next.0
+  - @backstage/config@1.0.7
+  - @backstage/theme@0.4.0-next.0
+  - @backstage/version-bridge@1.0.4
+
+## 0.13.2-next.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @backstage/theme@0.4.0-next.0
+  - @backstage/config@1.0.7
+  - @backstage/core-plugin-api@1.5.1
+  - @backstage/errors@1.1.5
+  - @backstage/version-bridge@1.0.4
+
 ## 0.13.1
 
 ### Patch Changes

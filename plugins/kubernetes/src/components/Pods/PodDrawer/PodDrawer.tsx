@@ -32,6 +32,7 @@ import { ContainerCard } from './ContainerCard';
 import { PodAndErrors } from '../types';
 import { KubernetesDrawer } from '../../KubernetesDrawer';
 import { PendingPodContent } from './PendingPodContent';
+import { ErrorList } from '../ErrorList';
 
 const useDrawerContentStyles = makeStyles((_theme: Theme) =>
   createStyles({
@@ -57,11 +58,22 @@ const useDrawerContentStyles = makeStyles((_theme: Theme) =>
 function getContainerSpecByName(pod: Pod, containerName: string) {
   return pod.spec?.containers.find(c => c.name === containerName);
 }
+
+/**
+ * Props for PodDrawer
+ *
+ * @public
+ */
 interface PodDrawerProps {
   open?: boolean;
   podAndErrors: PodAndErrors;
 }
 
+/**
+ * A Drawer for Kubernetes Pods
+ *
+ * @public
+ */
 export const PodDrawer = ({ podAndErrors, open }: PodDrawerProps) => {
   const classes = useDrawerContentStyles();
 
@@ -116,6 +128,16 @@ export const PodDrawer = ({ podAndErrors, open }: PodDrawerProps) => {
                 )}
               </ItemCardGrid>
             </Grid>
+            {podAndErrors.errors.length > 0 && (
+              <Grid item xs={12}>
+                <Typography variant="h5">Errors:</Typography>
+              </Grid>
+            )}
+            {podAndErrors.errors.length > 0 && (
+              <Grid item xs={12}>
+                <ErrorList podAndErrors={[podAndErrors]} />
+              </Grid>
+            )}
           </Grid>
         )}
       </div>
